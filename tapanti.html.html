@@ -1,0 +1,1444 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+  <meta name="theme-color" content="#1b4332">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Tapantí BioGuía · Registro de Campo</title>
+
+  <!-- Ícono profesional para la pantalla de inicio del celular -->
+  <link rel="apple-touch-icon" sizes="180x180" href="https://cdn.jsdelivr.net/gh/proquimicajcv-sketch/fichas-tapanti/img/ficha_001.jpg.jfif">
+  <link rel="icon" type="image/jpeg" sizes="32x32" href="https://cdn.jsdelivr.net/gh/proquimicajcv-sketch/fichas-tapanti/img/ficha_001.jpg.jfif">
+  <link rel="icon" type="image/jpeg" sizes="16x16" href="https://cdn.jsdelivr.net/gh/proquimicajcv-sketch/fichas-tapanti/img/ficha_001.jpg.jfif">
+
+  <style>
+    :root {
+      --primary: #1b4332;
+      --primary-dark: #081c15;
+      --primary-light: #2d6a4f;
+      --bg-color: #f3f5f3;
+      --surface: #ffffff;
+      --surface-alt: #f8faf8;
+      --text-main: #1d2d24;
+      --text-muted: #526759;
+      --border-light: #e0e6e1;
+      --success: #2b9348;
+      --radius-lg: 16px;
+      --radius-md: 10px;
+      --radius-sm: 6px;
+      --shadow-card: 0 4px 12px rgba(27, 67, 50, 0.08);
+      --shadow-modal: 0 10px 30px rgba(0, 0, 0, 0.25);
+      --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+    body {
+      font-family: var(--font-family);
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      line-height: 1.4;
+      padding-bottom: 40px;
+    }
+
+    /* Pantalla de Bienvenida (Splash Screen) */
+    #welcome-splash {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: linear-gradient(135deg, rgba(13, 31, 23, 0.94) 0%, rgba(27, 67, 50, 0.92) 100%),
+                  radial-gradient(circle at center, #2d6a4f 0%, #081c15 100%);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      backdrop-filter: blur(8px);
+      transition: opacity 0.4s ease;
+    }
+    #welcome-splash.fade-out { opacity: 0; pointer-events: none; }
+
+    .splash-card {
+      background: rgba(255, 255, 255, 0.95);
+      border: 1px solid rgba(128, 237, 153, 0.3);
+      border-radius: 20px;
+      padding: 28px 22px;
+      max-width: 440px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+      animation: splashPop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    @keyframes splashPop {
+      0% { transform: scale(0.9); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    .splash-badge { font-size: 0.7rem; font-weight: 800; letter-spacing: 1.5px; color: #2b9348; text-transform: uppercase; margin-bottom: 6px; }
+    .splash-card h2 { font-size: 1.4rem; color: #081c15; margin-bottom: 10px; font-weight: 700; }
+    .splash-text { font-size: 0.85rem; color: #4a5568; line-height: 1.5; margin-bottom: 14px; }
+    .splash-credits {
+      background: #f0f7f2; border-left: 4px solid #2b9348; padding: 10px 14px;
+      border-radius: 0 var(--radius-md) var(--radius-md) 0; font-size: 0.8rem; color: #1b4332; text-align: left; margin-bottom: 18px; line-height: 1.5;
+    }
+    .splash-credits strong { color: #081c15; }
+    .splash-author { font-size: 0.78rem; font-weight: 700; color: #526759; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 18px; }
+
+    .btn-splash-enter {
+      background: linear-gradient(135deg, #2b9348 0%, #1b4332 100%);
+      color: #fff; border: none; width: 100%; padding: 12px; border-radius: 12px;
+      font-size: 0.95rem; font-weight: 700; cursor: pointer; box-shadow: 0 4px 12px rgba(43, 147, 72, 0.3);
+    }
+
+    .app-header {
+      background: linear-gradient(135deg, #1b4332 0%, #081c15 100%);
+      color: #fff; padding: 16px 16px 12px; position: sticky; top: 0; z-index: 50; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px; }
+    .logo-area { display: flex; flex-direction: column; }
+    .park-badge { font-size: 0.65rem; font-weight: 700; letter-spacing: 1.2px; color: #80ed99; text-transform: uppercase; margin-bottom: 2px; }
+    .logo-area h1 { font-size: 1.25rem; font-weight: 700; letter-spacing: -0.3px; }
+
+    .header-actions-group { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+
+    .btn-header-tool, .btn-sightings-counter, .btn-auth-trigger {
+      background: rgba(255, 255, 255, 0.15); border: 1px solid rgba(255, 255, 255, 0.25);
+      border-radius: 30px; padding: 6px 12px; color: #fff; display: flex; align-items: center; gap: 6px;
+      cursor: pointer; backdrop-filter: blur(8px); font-size: 0.78rem; font-weight: 600;
+    }
+    .btn-header-tool:hover, .btn-sightings-counter:hover, .btn-auth-trigger:hover { background: rgba(255, 255, 255, 0.25); }
+    .count-pill { background: #52b788; color: #081c15; font-size: 0.72rem; font-weight: 800; padding: 2px 6px; border-radius: 12px; }
+
+    .search-filter-bar { display: flex; flex-direction: column; gap: 10px; }
+    .search-input-wrapper { position: relative; width: 100%; }
+    .search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); font-size: 0.9rem; opacity: 0.7; }
+    .search-input-wrapper input {
+      width: 100%; background: rgba(255, 255, 255, 0.12); border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: var(--radius-md); padding: 9px 36px 9px 34px; color: #fff; font-size: 0.9rem; outline: none;
+    }
+    .search-input-wrapper input::placeholder { color: rgba(255, 255, 255, 0.65); }
+    .btn-clear { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #fff; font-size: 1.2rem; cursor: pointer; opacity: 0.7; }
+
+    .filter-pills { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 2px; -webkit-overflow-scrolling: touch; }
+    .filter-pills::-webkit-scrollbar { display: none; }
+    .filter-pill {
+      background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #e2f0d9; font-size: 0.78rem; font-weight: 500; padding: 5px 12px; border-radius: 20px; white-space: nowrap; cursor: pointer;
+    }
+    .filter-pill.active { background: #80ed99; color: #081c15; font-weight: 700; border-color: #80ed99; }
+
+    .container { max-width: 1100px; margin: 0 auto; padding: 12px 14px; }
+    .stats-banner {
+      display: flex; justify-content: space-between; align-items: center; background: #e8f0ea;
+      border: 1px solid #d2e3d5; color: #2d5a3f; padding: 8px 14px; border-radius: var(--radius-md); font-size: 0.8rem; margin-bottom: 14px;
+    }
+
+    .cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 16px; }
+
+    .species-card {
+      background: var(--surface); border-radius: var(--radius-lg); border: 1px solid var(--border-light);
+      overflow: hidden; box-shadow: var(--shadow-card); display: flex; flex-direction: column; position: relative;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .species-card.is-seen { border: 2px solid #2b9348; }
+    .species-card.is-seen::after {
+      content: "✓ AVISTADO"; position: absolute; top: 10px; right: 10px;
+      background: #2b9348; color: #fff; font-size: 0.65rem; font-weight: 800; padding: 4px 8px; border-radius: 12px; z-index: 10;
+    }
+
+    /* ESTILOS DE CARTAS SEGÚN 7 NIVELES DE RAREZA */
+    .species-card.is-normal { border: 2px solid #94a3b8; background: #ffffff; }
+    .species-card.is-normal::before { content: "⚪ COMÚN"; position: absolute; top: 10px; left: 10px; background: #64748b; color: #fff; font-size: 0.62rem; font-weight: 900; padding: 3px 7px; border-radius: 12px; z-index: 10; }
+
+    .species-card.is-uncommon { border: 2px solid #22c55e; background: #ffffff; }
+    .species-card.is-uncommon::before { content: "🟢 POCO COMÚN"; position: absolute; top: 10px; left: 10px; background: #16a34a; color: #fff; font-size: 0.62rem; font-weight: 900; padding: 3px 7px; border-radius: 12px; z-index: 10; }
+
+    .species-card.is-rare { border: 2px solid #3b82f6; background: #ffffff; }
+    .species-card.is-rare::before { content: "🔵 RARA"; position: absolute; top: 10px; left: 10px; background: #2563eb; color: #fff; font-size: 0.62rem; font-weight: 900; padding: 3px 7px; border-radius: 12px; z-index: 10; }
+
+    .species-card.is-epic {
+      border: 2px solid #06b6d4;
+      background: linear-gradient(135deg, rgba(6,182,212,0.12) 0%, rgba(14,165,233,0.12) 100%), #ffffff;
+      box-shadow: 0 8px 24px rgba(6, 182, 212, 0.4);
+    }
+    .species-card.is-epic::before { content: "⚡ ÉPICA"; position: absolute; top: 10px; left: 10px; background: linear-gradient(135deg, #06b6d4, #0284c7); color: #fff; font-size: 0.65rem; font-weight: 900; padding: 4px 8px; border-radius: 12px; z-index: 10; box-shadow: 0 2px 6px rgba(0,0,0,0.2); }
+
+    .species-card.is-legendary {
+      border: 2px solid #eab308;
+      background: linear-gradient(135deg, rgba(234,179,8,0.15) 0%, rgba(202,138,4,0.15) 100%), #ffffff;
+      box-shadow: 0 8px 24px rgba(234, 179, 8, 0.45);
+    }
+    .species-card.is-legendary::before { content: "🌟 LEGENDARIA"; position: absolute; top: 10px; left: 10px; background: linear-gradient(135deg, #eab308, #ca8a04); color: #081c15; font-size: 0.65rem; font-weight: 900; padding: 4px 8px; border-radius: 12px; z-index: 10; box-shadow: 0 2px 6px rgba(0,0,0,0.2); }
+
+    .species-card.is-mythic {
+      border: 2px solid #a855f7;
+      background: linear-gradient(135deg, rgba(168,85,247,0.15) 0%, rgba(147,51,234,0.15) 100%), #ffffff;
+      box-shadow: 0 8px 24px rgba(168, 85, 247, 0.5);
+    }
+    .species-card.is-mythic::before { content: "🔮 MÍTICA"; position: absolute; top: 10px; left: 10px; background: linear-gradient(135deg, #a855f7, #9333ea); color: #fff; font-size: 0.65rem; font-weight: 900; padding: 4px 8px; border-radius: 12px; z-index: 10; box-shadow: 0 2px 6px rgba(0,0,0,0.2); }
+
+    .species-card.is-divine {
+      border: 2px solid #ec4899;
+      background: linear-gradient(135deg, rgba(236,72,153,0.18) 0%, rgba(244,63,94,0.18) 50%, rgba(250,204,21,0.18) 100%), #ffffff;
+      box-shadow: 0 10px 30px rgba(236, 72, 153, 0.6);
+    }
+    .species-card.is-divine::before { content: "👑 DIVINA"; position: absolute; top: 10px; left: 10px; background: linear-gradient(135deg, #ec4899, #f43f5e, #eab308); color: #fff; font-size: 0.65rem; font-weight: 900; padding: 4px 8px; border-radius: 12px; z-index: 10; box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
+
+    .card-img-wrapper { position: relative; width: 100%; aspect-ratio: 4/3; background: #232c25; overflow: hidden; cursor: pointer; }
+    .card-img-wrapper img { width: 100%; height: 100%; object-fit: cover; object-position: center 25%; }
+    .zoom-hint-badge { position: absolute; bottom: 8px; left: 8px; background: rgba(0, 0, 0, 0.65); color: #fff; font-size: 0.68rem; padding: 3px 8px; border-radius: 12px; pointer-events: none; z-index: 5; }
+
+    .card-body { padding: 12px 14px; display: flex; flex-direction: column; flex: 1; }
+    .card-meta-line { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+    .species-tag { font-size: 0.72rem; font-weight: 800; color: #1b4332; background: #e9f5ed; padding: 2px 7px; border-radius: var(--radius-sm); }
+    .status-badge { font-size: 0.68rem; font-weight: 700; padding: 2px 6px; border-radius: 4px; background: #e5e7eb; color: #374151; }
+    .status-badge.lc { background: #d1fae5; color: #065f46; }
+    .status-badge.vu { background: #fee2e2; color: #991b1b; }
+    .status-badge.nt { background: #e0f2fe; color: #0369a1; }
+    .status-badge.cr { background: #ffedd5; color: #9a3412; }
+    .status-badge.dd { background: #fef3c7; color: #92400e; }
+    .status-badge.ne { background: #e2e8f0; color: #475569; }
+
+    .species-sci-name { font-size: 1.05rem; font-weight: 700; font-style: italic; color: var(--primary-dark); line-height: 1.25; }
+    .species-com-name { font-size: 0.82rem; color: var(--text-muted); margin-bottom: 8px; }
+
+    .quick-traits { display: flex; flex-wrap: wrap; gap: 6px; font-size: 0.72rem; color: #3b5042; margin-bottom: 12px; }
+    .trait-item { background: var(--surface-alt); border: 1px solid var(--border-light); padding: 3px 6px; border-radius: 4px; }
+
+    .card-footer { margin-top: auto; border-top: 1px solid var(--border-light); padding-top: 10px; display: flex; gap: 8px; }
+    .btn-card-view { flex: 1; background: var(--surface-alt); border: 1px solid #ccd8cf; color: #274533; padding: 8px 10px; border-radius: var(--radius-md); font-size: 0.78rem; font-weight: 600; cursor: pointer; }
+    .btn-card-check { flex: 1.4; background: #e8f5e9; border: 1px solid #81c784; color: #1b5e20; padding: 8px 10px; border-radius: var(--radius-md); font-size: 0.8rem; font-weight: 700; cursor: pointer; }
+    .btn-card-check.checked { background: #2b9348; border-color: #2b9348; color: #fff; }
+
+    /* Modales */
+    .modal-overlay {
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(4px); z-index: 100; display: flex; align-items: center; justify-content: center; padding: 12px;
+    }
+    .modal-overlay.hidden { display: none; }
+    .modal-sheet {
+      background: var(--surface); border-radius: var(--radius-lg); max-width: 540px; width: 100%;
+      max-height: 92vh; overflow-y: auto; box-shadow: var(--shadow-modal); position: relative; display: flex; flex-direction: column;
+    }
+    .modal-close {
+      position: absolute; top: 12px; right: 12px; background: rgba(0, 0, 0, 0.6);
+      border: none; color: #fff; width: 32px; height: 32px; border-radius: 50%; font-size: 1.2rem; cursor: pointer; z-index: 20;
+    }
+
+    /* VISOR HD CON ZOOM Y SCROLL ACTIVO */
+    .card-viewer { background: #111; color: #fff; padding: 0; border: 1px solid #333; max-width: 900px; height: 90vh; }
+    .card-img-container { 
+      width: 100%; 
+      height: calc(90vh - 70px); 
+      background: #000; 
+      overflow: auto; 
+      display: flex; 
+      justify-content: center; 
+      align-items: center; 
+      position: relative; 
+    }
+    .card-img-container img { 
+      width: 100%; 
+      height: auto; 
+      object-fit: contain; 
+      transition: width 0.15s ease; 
+      display: block;
+      margin: auto;
+    }
+
+    .zoom-toolbar { position: absolute; bottom: 20px; right: 20px; display: flex; gap: 8px; z-index: 30; background: rgba(0,0,0,0.7); padding: 8px; border-radius: 30px; backdrop-filter: blur(4px); }
+    .btn-zoom { background: rgba(255,255,255,0.2); border: none; color: #fff; width: 38px; height: 38px; border-radius: 50%; font-size: 1.1rem; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+    .btn-zoom:active { background: rgba(255,255,255,0.4); }
+
+    .card-modal-footer { padding: 14px 16px; background: #181818; display: flex; justify-content: space-between; align-items: center; gap: 12px; height: 70px; }
+    .modal-species-info h3 { font-size: 0.95rem; font-style: italic; color: #80ed99; }
+    .modal-species-info p { font-size: 0.75rem; color: #bbb; }
+    .btn-primary-action { background: #2b9348; color: #fff; border: none; border-radius: var(--radius-md); padding: 9px 14px; font-weight: 700; cursor: pointer; }
+
+    .sighting-form-sheet { padding: 20px 18px; }
+    .sheet-header { border-bottom: 1px solid var(--border-light); padding-bottom: 12px; margin-bottom: 16px; position: relative; }
+    .sheet-title-group h2 { font-size: 1.15rem; color: var(--primary); font-style: italic; }
+    .sheet-title-group p { font-size: 0.85rem; color: var(--text-muted); }
+    .tag-number { display: inline-block; font-size: 0.72rem; font-weight: 800; background: #d8f3dc; color: #1b4332; padding: 2px 8px; border-radius: 4px; margin-bottom: 4px; }
+
+    .sighting-form { display: flex; flex-direction: column; gap: 14px; }
+    .form-row-compact { display: flex; gap: 10px; }
+    .form-group { display: flex; flex-direction: column; gap: 5px; }
+    .form-group.half { flex: 1; }
+    .form-group label { font-size: 0.78rem; font-weight: 700; }
+    .form-group input, .form-group select, .form-group textarea {
+      width: 100%; padding: 9px 12px; border: 1px solid #ced6cf; border-radius: var(--radius-md); font-family: inherit; font-size: 0.88rem; outline: none;
+    }
+
+    .form-actions { display: flex; gap: 10px; margin-top: 8px; }
+    .btn-primary { flex: 2; background: var(--primary); color: #fff; border: none; padding: 11px; border-radius: var(--radius-md); font-weight: 700; cursor: pointer; }
+    .btn-secondary { flex: 1; background: #e9ecef; color: #495057; border: none; padding: 11px; border-radius: var(--radius-md); font-weight: 600; cursor: pointer; }
+
+    .full-screen-sheet { max-width: 680px; height: 90vh; padding: 18px; }
+    .index-body { display: flex; flex-direction: column; flex: 1; overflow: hidden; }
+    .index-toolbar { display: flex; gap: 8px; padding-bottom: 12px; border-bottom: 1px solid var(--border-light); margin-bottom: 12px; flex-wrap: wrap; }
+    .btn-action-tool { background: #eaf4ed; border: 1px solid #c2dec9; color: #1b4332; font-size: 0.75rem; font-weight: 700; padding: 7px 11px; border-radius: var(--radius-sm); cursor: pointer; }
+    .btn-action-tool.danger { background: #fee2e2; border-color: #fca5a5; color: #991b1b; margin-left: auto; }
+    .sightings-list-container { overflow-y: auto; flex: 1; display: flex; flex-direction: column; gap: 10px; }
+
+    /* Estilo Glosario y Trivia */
+    .glossary-list, .trivia-box { display: flex; flex-direction: column; gap: 12px; overflow-y: auto; flex: 1; padding-right: 4px; }
+    .glossary-item { background: #fafcfa; border: 1px solid #e2e8f0; border-radius: var(--radius-md); padding: 12px; }
+    .glossary-term { font-weight: 800; color: #1b4332; font-size: 0.95rem; margin-bottom: 4px; }
+    .glossary-def { font-size: 0.82rem; color: #4a5568; line-height: 1.4; }
+
+    .trivia-question { font-size: 1.05rem; font-weight: 700; color: #081c15; margin-bottom: 12px; }
+    .trivia-options { display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; }
+    .trivia-option-btn { background: #f0f7f2; border: 1px solid #b7dfc3; color: #1b4332; padding: 11px 14px; border-radius: var(--radius-md); font-weight: 600; text-align: left; cursor: pointer; font-size: 0.9rem; }
+    .trivia-option-btn:hover { background: #e2f0d9; }
+    .trivia-option-btn.correct { background: #d1fae5 !important; border-color: #2b9348 !important; color: #065f46 !important; }
+    .trivia-option-btn.incorrect { background: #fee2e2 !important; border-color: #fca5a5 !important; color: #991b1b !important; }
+
+    .trivia-feedback { background: #f8faf8; border-left: 4px solid #2b9348; padding: 10px 12px; border-radius: 0 var(--radius-md) var(--radius-md) 0; font-size: 0.84rem; color: #1b4332; margin-bottom: 12px; line-height: 1.4; }
+    .trivia-nav-row { display: flex; gap: 10px; margin-top: auto; padding-top: 10px; }
+    .trivia-rank-banner { background: #e8f5e9; border: 1px solid #81c784; padding: 10px 14px; border-radius: var(--radius-md); font-size: 0.85rem; font-weight: 700; color: #1b4332; margin-bottom: 12px; text-align: center; }
+
+    /* Estilo Medalla y Rango en Índice */
+    .badge-banner {
+      background: linear-gradient(135deg, #e8f5e9 0%, #d8f3dc 100%);
+      border: 1px solid #81c784; border-radius: var(--radius-md); padding: 12px 14px;
+      margin-bottom: 12px; display: flex; align-items: center; gap: 12px; color: #1b4332;
+    }
+    .badge-icon { font-size: 2rem; }
+    .badge-info h4 { font-size: 0.92rem; font-weight: 800; }
+    .badge-info p { font-size: 0.76rem; color: #3b5042; }
+
+    .sighting-item-card { background: #fdfdfd; border: 1px solid #e1e7e2; border-left: 5px solid #2b9348; border-radius: var(--radius-md); padding: 12px; display: flex; flex-direction: column; gap: 6px; }
+    .sighting-item-top { display: flex; justify-content: space-between; align-items: flex-start; }
+    .sighting-item-title { font-size: 0.95rem; font-weight: 700; font-style: italic; color: #1b4332; }
+    .sighting-item-com { font-size: 0.78rem; color: var(--text-muted); }
+    .btn-remove-sighting { background: none; border: none; color: #999; cursor: pointer; font-size: 1.1rem; }
+    .sighting-meta-row { display: flex; flex-wrap: wrap; gap: 8px; font-size: 0.74rem; color: #3b5042; background: #f4f8f5; padding: 6px 10px; border-radius: var(--radius-sm); }
+    .sighting-note-text { font-size: 0.78rem; color: #4a5568; font-style: italic; }
+
+    /* Modal de Subida de Rango */
+    #modal-rankup {
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.8); z-index: 2000; display: flex; align-items: center; justify-content: center; padding: 20px;
+    }
+    #modal-rankup.hidden { display: none; }
+    .rankup-card {
+      background: #ffffff; border: 2px solid #80ed99; border-radius: 20px; padding: 30px 24px; max-width: 380px; width: 100%;
+      text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.5); animation: popUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    @keyframes popUp { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+    .rankup-icon { font-size: 3.5rem; margin-bottom: 10px; }
+    .rankup-title { font-size: 0.75rem; font-weight: 800; color: #2b9348; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 4px; }
+    .rankup-name { font-size: 1.3rem; color: #081c15; font-weight: 700; margin-bottom: 12px; }
+    .rankup-moto { font-size: 0.88rem; color: #4a5568; font-style: italic; line-height: 1.5; margin-bottom: 20px; background: #f0f7f2; padding: 10px; border-radius: 8px; }
+
+    /* Autenticación Styles */
+    .auth-form { display: flex; flex-direction: column; gap: 12px; padding: 18px; }
+    .password-wrapper { position: relative; width: 100%; }
+    .password-wrapper input { padding-right: 40px; }
+    .btn-toggle-password { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; font-size: 1.1rem; opacity: 0.7; }
+    .user-pill-badge { display: flex; align-items: center; gap: 6px; font-size: 0.75rem; color: #80ed99; background: rgba(0,0,0,0.2); padding: 2px 8px; border-radius: 12px; }
+
+    .toast {
+      position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: rgba(17, 24, 39, 0.92);
+      color: #fff; padding: 10px 18px; border-radius: 24px; font-size: 0.85rem; font-weight: 600; z-index: 200; transition: opacity 0.3s;
+    }
+    .toast.hidden { opacity: 0; }
+  </style>
+
+  <!-- Firebase Auth SDK Compat -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+</head>
+<body>
+
+  <!-- Pantalla de Bienvenida -->
+  <div id="welcome-splash">
+    <div class="splash-card">
+      <span class="splash-badge">🌿 Parque Nacional Tapantí</span>
+      <h2>BioGuía de Campo</h2>
+      <p class="splash-text">Herramienta interactiva para el registro de biodiversidad en los senderos de montaña.</p>
+      
+      <div class="splash-credits">
+        <strong>Agradecimiento especial:</strong> Sincero agradecimiento por el valioso aporte fotográfico a <strong>@reynerfoto_naturalistacr</strong> y a todos los naturalistas y colaboradores que hacen posible este registro natural.
+      </div>
+
+      <div class="splash-author">App Elaborada por: ElProfeCaminos</div>
+
+      <button id="btn-enter-app" class="btn-splash-enter">Comenzar Expedición</button>
+    </div>
+  </div>
+
+  <!-- Modal Emergente de Subida de Rango -->
+  <div id="modal-rankup" class="hidden">
+    <div class="rankup-card">
+      <div class="rankup-icon" id="rankup-icon">🏆</div>
+      <div class="rankup-title">¡Nuevo Rango Desbloqueado!</div>
+      <div class="rankup-name" id="rankup-name">Naturalista en Ruta</div>
+      <div class="rankup-moto" id="rankup-moto">“Tus pasos dejan huella y tus ojos descubren la vida oculta del bosque.”</div>
+      <button id="btn-close-rankup" class="btn-primary" style="width: 100%;">¡Continuar Expedición!</button>
+    </div>
+  </div>
+
+  <header class="app-header">
+    <div class="header-top">
+      <div class="logo-area">
+        <span class="park-badge">P. N. TAPANTÍ</span>
+        <h1>BioGuía de Campo</h1>
+      </div>
+      <div class="header-actions-group">
+        <button id="btn-open-glossary" class="btn-header-tool" title="Glosario Científico"><span>📖</span> Glosario</button>
+        <button id="btn-open-trivia" class="btn-header-tool" title="Trivia de Repaso"><span>🎮</span> Trivia</button>
+        <button id="btn-auth-trigger" class="btn-auth-trigger" title="Cuenta de Usuario">
+          <span>👤</span> <span id="auth-btn-label">Ingresar</span>
+        </button>
+        <button id="btn-view-sightings" class="btn-sightings-counter" title="Ver Avistamientos">
+          <span class="icon">📋</span>
+          <span id="counter-badge" class="count-pill">0</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="search-filter-bar">
+      <div class="search-input-wrapper">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="search-input" placeholder="Buscar especie o #ficha..." autocomplete="off">
+        <button id="clear-search" class="btn-clear hidden">&times;</button>
+      </div>
+      <div class="filter-pills" id="filter-container">
+        <button class="filter-pill active" data-filter="all">Todos (80)</button>
+        <button class="filter-pill" data-filter="Aves">🦅 Aves</button>
+        <button class="filter-pill" data-filter="Mamíferos">🦊 Mamíferos</button>
+        <button class="filter-pill" data-filter="Anfibios">🐸 Anfibios</button>
+        <button class="filter-pill" data-filter="Reptiles">🐍 Reptiles</button>
+        <button class="filter-pill" data-filter="Insectos">🐝 Insectos</button>
+        <button class="filter-pill" data-filter="Plantas">🌿 Plantas</button>
+        <button class="filter-pill" data-filter="Hongos">🍄 Hongos</button>
+        <button class="filter-pill" data-filter="Invertebrados">🐌 Invertebrados</button>
+        <button class="filter-pill" data-filter="seen">✅ Avistados</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="stats-banner" id="stats-banner">
+      <span>Explorando biodiversidad de montaña · Tapantí</span>
+      <span id="seen-ratio-text"><strong>0 de 80</strong> registrados</span>
+    </div>
+
+    <section class="cards-grid" id="cards-grid"></section>
+  </main>
+
+  <!-- Modal Glosario Científico -->
+  <div id="modal-glossary" class="modal-overlay hidden">
+    <div class="modal-sheet full-screen-sheet">
+      <div class="sheet-header">
+        <div class="sheet-title-group">
+          <span class="park-badge">CIENCIA Y TAXONOMÍA</span>
+          <h2>Glosario Científico de Campo</h2>
+          <p>25 conceptos esenciales para el estudio de la biodiversidad</p>
+        </div>
+        <button class="modal-close" id="close-glossary-modal">&times;</button>
+      </div>
+      <div class="index-body">
+        <div class="glossary-list" id="glossary-list-container"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Trivia de Repaso -->
+  <div id="modal-trivia" class="modal-overlay hidden">
+    <div class="modal-sheet full-screen-sheet" style="max-width: 520px;">
+      <div class="sheet-header">
+        <div class="sheet-title-group">
+          <span class="park-badge">RETO CIENTÍFICO</span>
+          <h2>Trivia de Biología y Campo</h2>
+          <p id="trivia-score-text">Pregunta 1 de 50 · Aciertos: 0</p>
+        </div>
+        <button class="modal-close" id="close-trivia-modal">&times;</button>
+      </div>
+      <div class="index-body">
+        <div id="trivia-rank-banner" class="trivia-rank-banner">🌱 Título Actual: Aprendiz de Campo (0 aciertos)</div>
+        <div class="trivia-box" id="trivia-box-container"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Ficha de Especie con Zoom Desplazable -->
+  <div id="modal-card" class="modal-overlay hidden">
+    <div class="modal-sheet card-viewer">
+      <button class="modal-close" id="close-card-modal">&times;</button>
+      <div class="card-img-container" id="zoom-container">
+        <img id="card-modal-img" src="" alt="Ficha Especie">
+        <div class="zoom-toolbar">
+          <button type="button" id="btn-zoom-in" class="btn-zoom" title="Acercar">＋</button>
+          <button type="button" id="btn-zoom-out" class="btn-zoom" title="Alejar">－</button>
+          <button type="button" id="btn-zoom-reset" class="btn-zoom" title="Restaurar" style="font-size: 0.75rem;">1:1</button>
+        </div>
+      </div>
+      <div class="card-modal-footer">
+        <div class="modal-species-info">
+          <h3 id="modal-card-title"></h3>
+          <p id="modal-card-common"></p>
+        </div>
+        <button id="modal-action-btn" class="btn-primary-action">
+          <span id="modal-btn-label">Registrar Avistamiento</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Registro de Avistamiento con GPS Automático y Permanente -->
+  <div id="modal-sighting" class="modal-overlay hidden">
+    <div class="modal-sheet sighting-form-sheet">
+      <div class="sheet-header">
+        <div class="sheet-title-group">
+          <span class="tag-number" id="form-species-num">#001</span>
+          <h2 id="form-species-name"></h2>
+          <p id="form-species-common"></p>
+        </div>
+        <button class="modal-close" id="close-sighting-modal">&times;</button>
+      </div>
+
+      <form id="sighting-form" class="sighting-form">
+        <div class="form-row-compact">
+          <div class="form-group half">
+            <label>📅 Fecha</label>
+            <input type="date" id="sight-date" required>
+          </div>
+          <div class="form-group half">
+            <label>⏰ Hora</label>
+            <input type="time" id="sight-time" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>📍 Sendero o Sector</label>
+          <select id="sight-trail">
+            <option value="Sendero La Pava">Sendero La Pava</option>
+            <option value="Sendero Oropéndola">Sendero Oropéndola</option>
+            <option value="Sendero Árboles Caídos">Sendero Árboles Caídos</option>
+            <option value="Mirador Río Grande de Orosi">Mirador Río Grande de Orosi</option>
+            <option value="Área de Picnic / Quebrada">Área de Picnic / Quebrada</option>
+            <option value="Otro sector">Otro sector / Camino principal</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>🌐 Coordenadas GPS (Automáticas)</label>
+          <input type="text" id="sight-gps" placeholder="Detectando ubicación exacta..." readonly>
+        </div>
+
+        <div class="form-group">
+          <label>🌿 Microhábitat / Ubicación exacta</label>
+          <input type="text" id="sight-habitat-note" placeholder="Ej: A 1m de altura en hoja de heliconia, hojarasca...">
+        </div>
+
+        <div class="form-group">
+          <label>📝 Observaciones adicionales (Opcional)</label>
+          <textarea id="sight-notes" rows="2" placeholder="Comportamiento, tamaño estimado, cantos, etc."></textarea>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" id="btn-cancel-sighting" class="btn-secondary">Cancelar</button>
+          <button type="submit" class="btn-primary">💾 Guardar Avistamiento</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal Índice de Avistamientos -->
+  <div id="modal-index" class="modal-overlay hidden">
+    <div class="modal-sheet full-screen-sheet">
+      <div class="sheet-header">
+        <div class="sheet-title-group">
+          <span class="park-badge">REGISTRO DE CAMPO</span>
+          <h2>Índice de Avistamientos</h2>
+          <p id="sighting-summary-stats">0 especies registradas</p>
+        </div>
+        <button class="modal-close" id="close-index-modal">&times;</button>
+      </div>
+
+      <div class="index-body">
+        <div id="badge-container"></div>
+        <div class="index-toolbar">
+          <button id="btn-export-csv" class="btn-action-tool"><span>📥</span> Exportar CSV</button>
+          <button id="btn-export-summary" class="btn-action-tool"><span>📄</span> Copiar Informe</button>
+          <button id="btn-clear-all" class="btn-action-tool danger"><span>🗑️</span> Reiniciar</button>
+        </div>
+        <div id="sightings-list" class="sightings-list-container"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Autenticación -->
+  <div id="modal-auth" class="modal-overlay hidden">
+    <div class="modal-sheet" style="max-width: 400px;">
+      <div class="sheet-header" style="margin-bottom: 0;">
+        <div class="sheet-title-group">
+          <span class="park-badge">CUENTA DE USUARIO</span>
+          <h2 id="auth-modal-title" style="color: #1b4332;">Iniciar Sesión</h2>
+        </div>
+        <button class="modal-close" id="close-auth-modal">&times;</button>
+      </div>
+
+      <form id="auth-form" class="auth-form">
+        <div class="form-group">
+          <label style="color: #1d2d24;">📧 Correo Electrónico</label>
+          <input type="email" id="auth-email" placeholder="estudiante@colegio.ed.cr" required>
+        </div>
+        <div class="form-group" id="auth-password-group">
+          <label style="color: #1d2d24;">🔒 Contraseña</label>
+          <div class="password-wrapper">
+            <input type="password" id="auth-password" placeholder="Mínimo 6 caracteres">
+            <button type="button" id="btn-toggle-pass" class="btn-toggle-password" title="Mostrar/Ocultar contraseña">👁️</button>
+          </div>
+        </div>
+
+        <div id="auth-error-msg" style="color: #991b1b; font-size: 0.78rem; text-align: center; display: none;"></div>
+
+        <button type="submit" id="auth-submit-btn" class="btn-primary" style="margin-top: 6px;">Iniciar Sesión</button>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 8px;">
+          <a id="auth-forgot-link" style="font-size: 0.78rem; color: #1b4332; cursor: pointer; text-decoration: underline;">¿Olvidaste tu contraseña?</a>
+          <a id="auth-switch-link" style="font-size: 0.78rem; color: #1b4332; cursor: pointer; font-weight: 700; text-decoration: underline;">Crear cuenta nueva</a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="toast" class="toast hidden"></div>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyDFdlSi2gTXm83zzIUAoIXl_CcIko9aMEo",
+      authDomain: "tapanti-bioguia.firebaseapp.com",
+      projectId: "tapanti-bioguia",
+      storageBucket: "tapanti-bioguia.firebasestorage.app",
+      messagingSenderId: "857207884307",
+      appId: "1:857207884307:web:a87236971df1d815b78de6",
+      measurementId: "G-XJPHYZ8SGH"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+
+    // Glosario Científico de 25 Términos
+    const GLOSSARY_DATA = [
+      { term: "Mastozoología", def: "Rama de la zoología que se dedica al estudio científico de los mamíferos." },
+      { term: "Herpetología", def: "Disciplina encargada del estudio de los anfibios (ranas, salamandras) y reptiles (serpientes, lagartijas)." },
+      { term: "Dimorfismo sexual", def: "Diferencias físicas externas notorias entre machos y hembras de una misma especie." },
+      { term: "Endemismo", def: "Condición en la cual una especie es nativa y exclusiva de una región geográfica restringida." },
+      { term: "Bioacústica", def: "Ciencia que estudia los sonidos producidos por los animales y su interacción con el ambiente." },
+      { term: "Sotobosque", def: "Capa de vegetación arbustiva y herbácea ubicada justo debajo del dosel del bosque." },
+      { term: "Criptpsis", def: "Adaptación evolutiva que permite a un organismo pasar desapercibido ante sus depredadores (camuflaje)." },
+      { term: "Aposematismo", def: "Coloración de advertencia muy llamativa en especies venenosas o tóxicas para disuadir depredadores." },
+      { term: "Saprófito", def: "Organismo (como hongos y bacterias) que se alimenta de materia orgánica en descomposición." },
+      { term: "Epífita", def: "Planta que crece sobre otra (como las orquídeas) utilizándola solo como soporte sin parasitarla." },
+      { term: "Dosel", def: "Capa superior o 'techo' formado por las copas de los árboles más altos del bosque." },
+      { term: "Microhábitat", def: "Espacio pequeño con condiciones ambientales particulares dentro de un hábitat mayor (ej. debajo de una roca húmeda)." },
+      { term: "Detritívoro", def: "Animales que se alimentan de detritos (restos de plantas y animales muertos)." },
+      { term: "Malacófaga", def: "Especialización alimentaria de animales que consumen moluscos (como caracoles)." },
+      { term: "Ofiófaga", def: "Dicho de un animal depredador que se alimenta exclusivamente de serpientes." },
+      { term: "Nectarívora", def: "Dieta basada en el consumo de néctar floral, típica de colibríes e insectos polinizadores." },
+      { term: "Autótrofa", def: "Capacidad de los organismos (plantas) para sintetizar su propio alimento mediante fotosíntesis." },
+      { term: "Zoófila", def: "Polinización o dispersión de semillas llevada a cabo por animales." },
+      { term: "Taxonomía", def: "Ciencia de la clasificación de los seres vivos en categorías jerárquicas (familia, género, especie)." },
+      { term: "Especie Sombrilla", def: "Especie cuya conservación protege indirectamente a muchas otras en su mismo ecosistema (ej. la Danta)." },
+      { term: "Fragmentación de hábitat", def: "División de un hábitat continuo en fragmentos menores debido a la intervención humana." },
+      { term: "Bioindicador", def: "Organismo cuya presencia o ausencia refleja el estado de salud y calidad ambiental de un ecosistema (ej. anfibios)." },
+      { term: "Corredor Biológico", def: "Áreas geográficas que conectan paisajes naturales para permitir el flujo genético de la fauna." },
+      { term: "Invasora", def: "Especies exóticas que se establecen y desplazan a la biodiversidad nativa local." },
+      { term: "Listas Rojas (UICN)", def: "Inventario mundial del estado de conservación de especies y su riesgo de extinción." }
+    ];
+
+    // Banco de 50 Preguntas con retroalimentación explicativa incluida
+    const TRIVIA_DATA = [
+      { q: "¿Cómo se le llama a la rama de la zoología que estudia a los mamíferos?", correct: "Mastozoología", others: ["Ornitología", "Herpetología", "Ictiología"], feedback: "La mastozoología es la disciplina científica enfocada exclusivamente en el estudio de los mamíferos." },
+      { q: "¿Qué nombre recibe el camuflaje que permite a un animal pasar desapercibido?", correct: "Criptpsis", others: ["Aposematismo", "Mimetismo", "Dimorfismo"], feedback: "La criptpsis es la capacidad de un organismo para confundirse con el fondo o sustrato y evitar ser visto." },
+      { q: "¿Cuál es la función principal de una planta epífita como las orquídeas?", correct: "Usarlo solo como soporte", others: ["Parasitar al árbol", "Absorber su savia", "Destruir el tronco"], feedback: "Las epífitas crecen sobre los árboles buscando mejor luz, pero fabrican su propio alimento sin dañarlos." },
+      { q: "¿Qué significa que una especie sea considerada un 'Bioindicador'?", correct: "Que refleja la salud ambiental", others: ["Que es muy grande", "Que brilla en la oscuridad", "Que es carnívora"], feedback: "Los bioindicadores (como los anfibios) son sensibles a los cambios y revelan el estado de conservación del ecosistema." },
+      { q: "¿Cómo se denomina el estrato vegetal ubicado justo debajo del dosel del bosque?", correct: "Sotobosque", others: ["Raíz", "Dosel alto", "Subsuelo"], feedback: "El sotobosque recibe poca luz directa y concentra gran humedad, hojarasca y biodiversidad rastrera." },
+      { q: "¿Qué término describe las diferencias físicas notorias entre machos y hembras?", correct: "Dimorfismo sexual", others: ["Endemismo", "Aposematismo", "Criptpsis"], feedback: "El dimorfismo sexual se observa claramente en muchas aves y anfibios por tamaño o coloración." },
+      { q: "¿Cuál es la dieta principal de un organismo con hábitos 'malacófagos'?", correct: "Caracoles y moluscos", others: ["Insectos", "Néctar", "Hojas secas"], feedback: "Las serpientes caracoleras del género Sibon son un claro ejemplo de especialización malacófaga." },
+      { q: "¿Qué caracteriza a una especie con coloración aposemática?", correct: "Advierte que es tóxica o venenosa", others: ["Es totalmente invisible", "Es muy veloz", "Se alimenta de hongos"], feedback: "El aposematismo usa colores vivos (como rojo y amarillo) para alertar a los depredadores sobre su toxicidad." },
+      { q: "¿Qué disciplina científica estudia a los anfibios y reptiles?", correct: "Herpetología", others: ["Mastozoología", "Entomología", "Botánica"], feedback: "La herpetología abarca el estudio de ranas, salamandras, serpientes y lagartijas." },
+      { q: "¿Cómo se le llama a una especie exclusiva de una región geográfica restringida?", correct: "Endémica", others: ["Invasora", "Migratoria", "Cosmopolita"], feedback: "El endemismo es crítico en zonas montañosas tropicales debido al aislamiento geográfico." },
+      { q: "¿Qué estudia la bioacústica en los bosques tropicales?", correct: "Los sonidos de la fauna", others: ["Las corrientes de agua", "La temperatura del suelo", "La composición química de las hojas"], feedback: "La bioacústica analiza vocalizaciones de aves y anfibios para monitoreo e identificación." },
+      { q: "¿Qué rol ecológico cumple principalmente un organismo saprófito?", correct: "Descomposición de materia orgánica", others: ["Polinización", "Depredador tope", "Fotosíntesis masiva"], feedback: "Los hongos saprófitos reciclan nutrientes esenciales al descomponer madera y hojarasca." },
+      { q: "¿Cuál es el rol ecológico principal de la Danta (Tapirus bairdii) en Tapantí?", correct: "Dispersor de semillas y especie sombrilla", others: ["Plaga agrícola", "Polinizador nocturno", "Descompositor de rocas"], feedback: "Al consumir frutos y caminar grandes distancias, la danta dispersa semillas y protege amplias áreas." },
+      { q: "¿Qué significa que un organismo sea 'detritívoro'?", correct: "Consume restos de materia orgánica en descomposición", others: ["Se alimenta de presas vivas", "Solo come frutos dulces", "Es estrictamente carnívoro"], feedback: "Los detritívoros aceleran el ciclo de nutrientes en el suelo del bosque." },
+      { q: "¿Qué describe el término 'ofiófago'?", correct: "Animales que comen serpientes", others: ["Animales que se alimentan de aves", "Plantas carnívoras", "Hongos subterráneos"], feedback: "Especies como la falsa coral se alimentan de otras serpientes, mostrando una dieta ofiófaga." },
+      { q: "¿Qué grupo taxonómico incluye al colibrí centelleante?", correct: "Aves", others: ["Mamíferos", "Reptiles", "Anfibios"], feedback: "Los colibríes pertenecen a la clase Aves y son polinizadores indispensables." },
+      { q: "¿Por qué los anfibios son excelentes bioindicadores de la salud ambiental?", correct: "Tienen piel permeable y sensible a contaminantes", others: ["Viven únicamente en el mar", "Son inmunes a todo", "Tienen sangre caliente"], feedback: "Su piel desnuda absorbe con facilidad contaminantes del agua y el aire." },
+      { q: "¿Qué es el dosel en un ecosistema de bosque nuboso?", correct: "La capa superior formada por las copas de los árboles", others: ["El suelo cubierto de musgo", "Las raíces profundas", "Los ríos caudalosos"], feedback: "El dosel concentra la mayor parte de la actividad fotosintética y vida arbórea." },
+      { q: "¿Qué tipo de alimentación tiene una especie 'nectarívora'?", correct: "Consumo de néctar floral", others: ["Consumo de madera", "Consumo de sangre", "Consumo de semillas duras"], feedback: "Las adaptaciones en el pico y lengua de colibríes responden a esta dieta energética." },
+      { q: "¿Qué significa que una planta sea 'autótrofa'?", correct: "Fabrica su propio alimento por fotosíntesis", others: ["Necesita comer otros animales", "Crece sin luz solar", "Vive bajo tierra"], feedback: "Las plantas utilizan luz solar, agua y CO2 para producir glucosa." },
+      { q: "¿Qué es un microhábitat?", correct: "Un espacio reducido con condiciones particulares dentro de un hábitat", others: ["Un continente entero", "Una especie extinta", "Una bacteria patógena"], feedback: "Un hongo bajo un tronco húmedo representa un microhábitat con su propio clima local." },
+      { q: "¿Qué evalúa la Lista Roja de la UICN?", correct: "El riesgo de extinción de las especies", others: ["La velocidad de los animales", "La cantidad de lluvia anual", "La altura de las montañas"], feedback: "Clasifica el estado de conservación global para priorizar esfuerzos de protección." },
+      { q: "¿Qué son los corredores biológicos?", correct: "Áreas que conectan fragmentos naturales para el paso de fauna", others: ["Carreteras pavimentadas", "Zonas industriales", "Ríos artificiales"], feedback: "Permiten el flujo genético y movimiento seguro de animales entre reservas." },
+      { q: "¿Qué impacto generan las especies invasoras en un ecosistema nativo?", correct: "Desplazan y compiten con la flora y fauna local", others: ["Ayudan a la conservación", "Mejoran el suelo", "Aumentan la estabilidad"], feedback: "Al no tener depredadores naturales, alteran severamente el equilibrio ecológico." },
+      { q: "¿Qué es la taxonomía en biología?", correct: "La ciencia de clasificar y nombrar a los seres vivos", others: ["El estudio del clima", "La medición de la contaminación", "El estudio de los fósiles"], feedback: "Utiliza categorías ordenadas desde Dominio hasta Especie." },
+      { q: "¿Cuál es el estado de conservación UICN asignado a la Danta en nuestra guía?", correct: "Vulnerable (VU)", others: ["Preocupación Menor (LC)", "Extinto (EX)", "No Evaluado (NE)"], feedback: "La danta sufre presiones por cacería y pérdida de bosque primario." },
+      { q: "¿Qué adaptaciones presentan las salamandras de altura en Tapantí?", correct: "Respiración cutánea y vida en hojarasca húmeda", others: ["Vuelan largas distancias", "Nacen en el mar", "Tienen caparazón duro"], feedback: "Muchas salamandras neotropicales carecen de pulmones y respiran a través de la piel." },
+      { q: "¿Qué es la fragmentación de hábitat?", correct: "La división de un hábitat continuo en partes más pequeñas", others: ["La unión de dos bosques", "La reforestación", "La erupción volcánica"], feedback: "Aísla poblaciones silvestres y reduce la diversidad genética." },
+      { q: "¿Qué función cumple el sistema GPS en nuestra BioGuía de campo?", correct: "Ubicar con precisión el registro de avistamiento", others: ["Reproducir música", "Medir la temperatura ambiental", "Tomar fotografías panorámicas"], feedback: "Facilita la recolección de datos geográficos para proyectos de ciencia ciudadana." },
+      { q: "¿Por qué es importante registrar el microhábitat en un avistamiento?", correct: "Para entender dónde vive y cuáles son sus requerimientos ecológicos", others: ["Para adornar el reporte", "Para saber su precio", "Para calcular su peso"], feedback: "Aporta información científica valiosa sobre el comportamiento y ecología de la especie." },
+      { q: "¿Qué caracteriza a los mamíferos carnívoros como el Ocelote o el Puma?", correct: "Dietas basadas en presas vivas y roles de depredadores tope", others: ["Alimentación herbívora estricta", "Polinización de flores nocturnas", "Ausencia de visión nocturna"], feedback: "Controlan las poblaciones de herbívoros y mantienen la salud del ecosistema." },
+      { q: "¿Qué significa que un organismo sea de hábitos nocturnos?", correct: "Realiza sus actividades principales durante la noche", others: ["Duerme todo el año", "Solo sale al mediodía", "Vuela hacia el sol"], feedback: "Muchos anfibios y mamíferos evitan depredadores diurnos adoptando este hábito." },
+      { q: "¿Qué grupo de plantas destaca en los troncos de los árboles en Tapantí?", correct: "Orquídeas y bromelias epífitas", others: ["Cactus desérticos", "Algas marinas", "Pasto sabanero"], feedback: "Aprovechan la humedad ambiental y la altura para captar luz." },
+      { q: "¿Qué representa una carta holográfica 'Divina' en la app?", correct: "El máximo tesoro biológico del parque (La Danta)", others: ["Un error del sistema", "An especie común", "Una planta medicinal"], feedback: "Es el galardón máximo de avistamiento por su importancia de conservación." },
+      { q: "¿Cuál es la principal amenaza natural o antrópica para los bosques nubosos?", correct: "La deforestación y el cambio climático", others: ["El exceso de oxígeno", "La luz de la luna", "El canto de las aves"], feedback: "Alteran los regímenes de neblina y humedad indispensables para la flora endémica." },
+      { q: "¿Qué es una especie nativa por describir (ej. Lema sp.)?", correct: "Una especie identificada pero pendiente de estudio formal y descripción taxonómica", others: ["Un animal extinto", "Un animal doméstico", "Una planta artificial"], feedback: "Demuestra que la biodiversidad tropical aún guarda muchos misterios." },
+      { q: "¿Qué son los hongos de copa gelatinosos (Neobulgaria pura)?", correct: "Hongos descomponedores saprófitos del bosque húmedo", others: ["Mamíferos subterráneos", "Pájaros carpinteros", "Insectos acuáticos"], feedback: "Prosperan sobre troncos caídos en descomposición durante épocas lluviosas." },
+      { q: "¿Qué rol cumple el colibrí centelleante en el ecosistema?", correct: "Polinizador clave de flores montañosas", others: ["Depredador de mamíferos", "Descomponedor de madera", "Constructor de madrigueras"], feedback: "Su metabolismo acelerado requiere visitar decenas de flores diarias." },
+      { q: "¿Qué es la bioacústica aplicada a la conservación?", correct: "Monitorear la biodiversidad a través de grabaciones de cantos de animales", others: ["Grabar canciones humanas", "Medir la profundidad de los ríos", "Contar árboles caídos"], feedback: "Permite registrar especies elusivas sin perturbarlas en su hábitat." },
+      { q: "¿Qué significa la sigla 'LC' en el estado de conservación de una ficha?", correct: "Preocupación Menor (Least Concern)", others: ["León Cazador", "Localización Cerrada", "Límite Climático"], feedback: "Indica que la especie evaluada no enfrenta un riesgo inminente de extinción." },
+      { q: "¿Qué significa la sigla 'VU' en una especie?", correct: "Vulnerable", others: ["Vida Útil", "Verde Urbano", "Vuelo Único"], feedback: "Señala un alto riesgo de amenaza en estado silvestre a mediano plazo." },
+      { q: "¿Qué significa 'DD' en datos de conservación?", correct: "Datos Deficientes (Data Deficient)", others: ["Danta Dorada", "Distribución Diurna", "Depredador Directo"], feedback: "Indica que no hay suficiente información científica para evaluar su estatus." },
+      { q: "¿Por qué el suelo de Tapantí es tan rico en hongos y salamandras?", correct: "Por la alta humedad y abundancia de materia orgánica en descomposición", others: ["Por la contaminación urbana", "Por la escasez de agua", "Por el calor extremo"], feedback: "Las condiciones de bosque nuboso propician microhábitats ideales para estos organismos." },
+      { q: "¿Qué es un inventario de biodiversidad en una gira escolar?", correct: "El registro sistemático de especies observadas en campo", others: ["Una lista de compras", "Un mapa de carreteras", "Un examen teórico en el aula"], feedback: "Es la metodología base de la ciencia ciudadana escolar." },
+      { q: "¿Cómo contribuye la aplicación al concepto de 'Ciencia Ciudadana'?", correct: "Permitiendo que estudiantes aporten datos reales de avistamientos", others: ["Cobrando impuestos", "Creando leyes de tránsito", "Vendiendo recuerdos"], feedback: "Involucra a la sociedad en la recolección de datos científicos útiles." },
+      { q: "¿Qué característica física distingue a las serpientes venenosas del género Bothriechis (como la Lora)?", correct: "Hábitos arborícolas y fosas termorreceptoras", others: ["Cascabel en la cola", "Alimentación herbívora", "Incapacidad de morder"], feedback: "Sus fosas detectan el calor de presas de sangre caliente en la oscuridad." },
+      { q: "¿Qué importancia tienen los insectos como el escarabajo de plata en el bosque?", correct: "Participan en redes tróficas y descomposición", others: ["Transmiten electricidad", "Contaminan el aire", "Construyen puentes"], feedback: "Tienen adaptaciones estructurales fascinantes para el camuflaje." },
+      { q: "¿Cuál es el hábitat característico del Parque Nacional Tapantí?", correct: "Bosque pluvial montañoso / Bosque nuboso", others: ["Desierto de arena", "Arrecife de coral", "Tundra polar"], feedback: "Caracterizado por precipitaciones elevadas y neblina constante." },
+      { q: "¿Qué representa el sistema de rangos y medallas en la BioGuía?", correct: "Una motivación lúdica basada en el progreso de avistamientos", others: ["Un castigo escolar", "Un sistema de pagos", "Una regla de disciplina"], feedback: "Gamifica el aprendizaje para fomentar la curiosidad científica." },
+      { q: "¿Por qué es fundamental la ética ambiental durante una gira a un Parque Nacional?", correct: "Para no dejar rastro ni alterar la fauna y flora silvestre", others: ["Para correr más rápido", "Para hacer mucho ruido", "Para cazar animales raros"], feedback: "Garantiza la preservación del ecosistema y el respeto por la naturaleza." }
+    ];
+
+    const SPECIES_DATA = [
+      { id: "001", sciName: "Duellmanohyla uranochroa", comName: "Ranita de ojos rojos del Pacífico", group: "Anfibios", danger: "Inofensiva", status: "LC", activity: "Nocturna", diet: "Insectívora", rarity: "epic", img: "https://cdn.jsdelivr.net/gh/proquimicajcv-sketch/fichas-tapanti/img/ficha_001.jpg.jfif" },
+      { id: "002", sciName: "Nototriton tapanti", comName: "Salamandra de Tapantí", group: "Anfibios", danger: "Inofensiva", status: "DD", activity: "Nocturna", diet: "Insectívora", rarity: "rare", img: "https://cdn.jsdelivr.net/gh/proquimicajcv-sketch/fichas-tapanti/img/ficha_002.jpg.jfif" },
+      { id: "003", sciName: "Chironius exoletus", comName: "Serpiente látigo verde", group: "Reptiles", danger: "Inofensiva", status: "LC", activity: "Diurna", diet: "Carnívora", rarity: "uncommon", img: "https://cdn.jsdelivr.net/gh/proquimicajcv-sketch/fichas-tapanti/img/ficha_003.jpg.jfif" },
+      { id: "004", sciName: "Bolitoglossa colonnea", comName: "Salamandra cejuda", group: "Anfibios", danger: "Inofensiva", status: "LC", activity: "Nocturna", diet: "Insectívora", rarity: "rare", img: "https://cdn.jsdelivr.net/gh/proquimicajcv-sketch/fichas-tapanti/img/ficha_004.jpg.jfif" },
+      { id: "005", sciName: "Craugastor underwoodi", comName: "Ranita de lluvia de Underwood", group: "Anfibios", danger: "Inofensiva", status: "LC", activity: "Nocturna", diet: "Insectívora", rarity: "uncommon", img: "https://cdn.jsdelivr.net/gh/proquimicajcv-sketch/fichas-tapanti/img/ficha_005.jpg.jfif" },
+      { id: "006", sciName: "Craugastor gollmeri", comName: "Rana de lluvia de Gollmer", group: "Anfibios", danger: "Inofensiva", status: "LC", activity: "Nocturna", diet: "Insectívora", rarity: "uncommon", img: "https://cdn.jsdelivr.net/gh/proquimicajcv-sketch/fichas-tapanti/img/ficha_006.jpg.jfif" },
+      { id: "007", sciName: "Craugastor melanostictus", comName: "Craugastor de altura", group: "Anfibios", danger: "Inofensiva", status: "VU", activity: "Nocturna", diet: "Insectívora", rarity: "rare", img: "https://cdn.jsdelivr.net/gh/proquimicajcv-sketch/fichas-tapanti/img/ficha_007.jpg.jfif" },
+      { id: "008", sciName: "Bolitoglossa robusta", comName: "Salamandra robusta", group: "Anfibios", danger: "Inofensiva", status: "LC", activity: "Nocturna", diet: "Insectívora", rarity: "rare", img: "https://cdn.jsdelivr.net/gh/proquimicajcv-sketch/fichas-tapanti/img/ficha_008.jpg.jfif" },
+      { id: "009", sciName: "Bolitoglossa epimela", comName: "Salamandra de Talamanca", group: "Anfibios", danger: "Inofensiva", status: "LC", activity: "Nocturna", diet: "Insectívora", rarity: "rare", img: "https://cdn.jsdelivr.net/gh/proquimicajcv-sketch/fichas-tapanti/img/ficha_009.jpg.jfif" },
+      { id: "010", sciName: "Sibon dimidiatus", comName: "Caracolera cordel negro", group: "Reptiles", danger: "Inofensiva", status: "LC", activity: "Nocturna", diet: "Malacófaga", rarity: "uncommon", img: "https://cdn.jsdelivr.net/gh/proquimicajcv-sketch/fichas-tapanti/img/ficha_010.jpg.jfif" },
+      { id: "011", sciName: "Sibon annulatus", comName: "Caracolera anillada", group: "Reptiles", danger: "Inofensiva", status: "LC", activity: "Nocturna", diet: "Malacófaga", rarity: "uncommon", img: "https://cdn.jsdelivr.net/gh/proquimicajcv-sketch/fichas-tapanti/img/ficha_011.jpg.jfif" },
+      { id: "012", sciName: "Bothriechis lateralis", comName: "Serpiente lora / Lora verde", group: "Reptiles", danger: "Venenosa", status: "LC", activity: "Nocturna", diet: "Carnívora", rarity: "epic", img: "https://cdn.jsdelivr.net/gh/proquimicajcv-sketch/fichas-tapanti/img/ficha_012.jpg.png" },
+      { id: "013", sciName: "Bothriechis nigroviridis", comName: "Toboba de árbol", group: "Reptiles", danger: "Venenosa", status: "LC", activity: "Nocturna", diet: "Carnívora", rarity: "legendary", img: "https://cdn.jsdelivr.net/gh/proquimicajcv-sketch/fichas-tapanti/img/ficha_013.jpg.png" },
+      { id: "014", sciName: "Tapirus bairdii", comName: "Danta centroamericana", group: "Mamíferos", danger: "Inofensiva", status: "VU", activity: "Diurna/Nocturna", diet: "Herbívora", rarity: "divine", img: "https://cdn.jsdelivr.net/gh/proquimicajcv-sketch/fichas-tapanti/img/ficha_014.jpg.png" },
+      { id: "015", sciName: "Leopardus wiedii", comName: "Caucel / Margay", group: "Mamíferos", danger: "Inofensiva", status: "LC", activity: "Nocturna", diet: "Carnívora", rarity: "epic", img: "https://cdn.jsdelivr.net/gh/proquimicajcv-sketch/fichas-tapanti/img/ficha_015.jpg.jfif" },
+      { id: "016", sciName: "Nasua narica", comName: "Pizote / Coati", group: "Mamíferos", danger: "Inofensiva", status: "LC", activity: "Diurna", diet: "Omnívora", rarity: "normal", img: "https://cdn.jsdelivr.net/gh/proquimicajcv-sketch/fichas-tapanti/img/ficha_016.jpg.jfif" },
+      { id: "017", sciName: "Procyon lotor", comName: "Mapache", group: "Mamíferos", danger: "Inofensiva", status: "LC", activity: "Nocturna", diet: "Omnívora", rarity: "normal", img: "https://cdn.jsdelivr.net/gh/proquimicajcv-sketch/fichas-tapanti/img/ficha_017.jpg.jfif" },
+      { id: "018", sciName: "Eira barbara", comName: "Tolomuco / Tayra", group: "Mamíferos", danger: "Inofensiva", status: "LC", activity: "Diurna", diet: "Omnívora", rarity: "uncommon", img: "https://cdn.jsdelivr.net/gh/proquimicajcv-sketch/fichas-tapanti/img/ficha_018.jpg.jfif" },
+      { id: "019", sciName: "Dasyprocta punctata", comName: "Guatusa / Aguti", group: "Mamíferos", danger: "Inofensiva", status: "LC", activity: "Diurna", diet: "Frugívora", rarity: "normal", img: "https://cdn.jsdelivr.net/gh/proquimicajcv-sketch/fichas-tapanti/img/ficha_019.jpg.jfif" },
+      { id: "020", sciName: "Choloepus hoffmanni", comName: "Perezoso de dos dedos", group: "Mamíferos", danger: "Inofensiva", status: "LC", activity: "Nocturna", diet: "Herbívora", rarity: "uncommon", img: "https://cdn.jsdelivr.net/gh/proquimicajcv-sketch/fichas-tapanti/img/ficha_020.jpg.jfif" },
+      { id: "021", sciName: "Mazama temama", comName: "Cabro de monte", group: "Mamíferos", danger: "Inofensiva", status: "LC", activity: "Diurna", diet: "Herbívora", rarity: "uncommon", img: "https://cdn.jsdelivr.net/gh/proquimicajcv-sketch/fichas-tapanti/img/ficha_021.jpg.jfif" },
+      { id: "022", sciName: "Basiliscus plumifrons", comName: "Basilisco verde", group: "Reptiles", danger: "Inofensiva", status: "LC", activity: "Diurna", diet: "Omnívora", rarity: "normal", img: "https://cdn.jsdelivr.net/gh/proquimicajcv-sketch/fichas-tapanti/img/ficha_022.jpg.jfif" },
+      { id: "023", sciName: "Bassaricyon gabbii", comName: "Olingo de Gabbi", group: "Mamíferos", danger: "Inofensiva", status: "LC", activity: "Nocturna", diet: "Omnívora", rarity: "uncommon", img: "https://cdn.jsdelivr.net/gh/proquimicajcv-sketch/fichas-tapanti/img/ficha_023.jpg.jfif" },
+      { id: "024", sciName: "Spartocera gigantea", comName: "Chinche roja y negra", group: "Insectos", danger: "Inofensiva", status: "LC", activity: "Diurna", diet: "Fitófaga", rarity: "uncommon", img: "https://cdn.jsdelivr.net/gh/proquimicajcv-sketch/fichas-tapanti/img/ficha_024.jpg.jfif" },
+      { id: "025", sciName: "Zammara tympanum", comName: "Chicharra", group: "Insectos", danger: "Inofensiva", status: "LC", activity: "Diurna", diet: "Suctoria", rarity: "normal", img: "https://cdn.jsdelivr.net/gh/proquimicajcv-sketch/fichas-tapanti/img/ficha_025.jpg.jfif" },
+      { id: "026", sciName: "Selasphorus scintilla", comName: "Colibrí centelleante", group: "Aves", danger: "Inofensiva", status: "LC", activity: "Diurna", diet: "Nectarívora", rarity: "normal", img: "https://cdn.jsdelivr.net/gh/proquimicajcv-sketch/fichas-tapanti/img/ficha_026.jpg.jfif" },
+      { id: "027", sciName: "Chrysina chrysargyrea", comName: "Escarabajo de plata", group: "Insectos", danger: "Inofensiva", status: "LC", activity: "Diurna", diet: "Fitófaga", rarity: "rare", img: "https://cdn.jsdelivr.net/gh/proquimicajcv-sketch/fichas-tapanti/img/ficha_027.jpg.jfif" },
+      { id: "028", sciName: "Epidendrum jorge-warneri", comName: "Orquídea Epidendro", group: "Plantas", danger: "Inofensiva", status: "LC", activity: "Diurna", diet: "Autótrofa", rarity: "uncommon", img: "https://cdn.jsdelivr.net/gh/proquimicajcv-sketch/fichas-tapanti/img/ficha_028.jpg.jfif" },
+      { id: "029", sciName: "Neobulgaria pura", comName: "Hongo de copa gelatinoso", group: "Hongos", danger: "Inofensiva", status: "NE", activity: "Saprófita", diet: "Decompositora", rarity: "uncommon", img: "https://cdn.jsdelivr.net/gh/proquimicajcv-sketch/fichas-tapanti/img/ficha_029.jpg.jfif" },
+      { id: "030", sciName: "Epidendrum lacustre", comName: "Orquídea de laguna", group: "Plantas", danger: "Inofensiva", status: "NE", activity: "Diurna", diet: "Autótrofa", rarity: "uncommon", img: "https://cdn.jsdelivr.net/gh/proquimicajcv-sketch/fichas-tapanti/img/ficha_030.jpg.jfif" },
+      { id: "031", sciName: "Trogon collaris", comName: "Coa de Collar", group: "Aves", danger: "Inofensiva", status: "LC", activity: "Diurna", diet: "Omnívora", rarity: "uncommon", img: "https://cdn.jsdelivr.net/gh/proquimicajcv-sketch/fichas-tapanti/img/ficha_031.jpg.jfif" },
+      { id: "032", sciName: "Daptrius chimachima", comName: "Chimachima", group: "Aves", danger: "Inofensiva", status: "LC", activity: "Diurna", diet: "Omnívora", rarity: "normal", img: "https://cdn.jsdelivr.net/gh/proquimicajcv-sketch/fichas-tapanti/img/ficha_032.jpg.jfif" },
+      { id: "033", sciName: "Cyanerpes cyaneus", comName: "Mielero Patas Rojas", group: "Aves", danger: "Inofensiva", status: "LC", activity: "Diurna", diet: "Nectarívora", rarity: "normal", img: "https://cdn.jsdelivr.net/gh/proquimicajcv-sketch/fichas-tapanti/img/ficha_033.jpg.jfif" },
+      { id: "034", sciName: "Setophaga aestiva", comName: "Chipe Amarillo Norteño", group: "Aves", danger: "Inofensiva", status: "LC", activity: "Diurna", diet: "Insectívora", rarity: "normal", img: "https://cdn.jsdelivr.net/gh/proquimicajcv-sketch/fichas-tapanti/img/ficha_034.jpg.jfif" },
+      { id: "035", sciName: "Marmosa zeledoni", comName: "Zorricí / Marmosa", group: "Mamíferos", danger: "Inofensiva", status: "LC", activity: "Nocturna", diet: "Omnívora", rarity: "rare", img: "https://cdn.jsdelivr.net/gh/proquimicajcv-sketch/fichas-tapanti/img/ficha_035.jpg.jfif" },
+      { id: "036", sciName: "Renealmia cernua", comName: "Jengibre silvestre", group: "Plantas", danger: "Inofensiva", status: "NE", activity: "Diurna", diet: "Polinización", rarity: "uncommon", img: "https://cdn.jsdelivr.net/gh/proquimicajcv-sketch/fichas-tapanti/img/ficha_036.jpg.jfif" },
+      { id: "037", sciName: "Imantodes cenchoa", comName: "Culebra Cordelilla Chata", group: "Reptiles", danger: "Inofensiva", status: "LC", activity: "Nocturna", diet: "Carnívora", rarity: "rare", img: "https://cdn.jsdelivr.net/gh/proquimicajcv-sketch/fichas-tapanti/img/ficha_037.jpg.jfif" },
+      { id: "038", sciName: "Lema sp.", comName: "Especie nativa por describir", group: "Insectos", danger: "Inofensiva", status: "NE", activity: "Diurna", diet: "Folívora", rarity: "rare", img: "https://cdn.jsdelivr.net/gh/proquimicajcv-sketch/fichas-tapanti/img/ficha_038.jpg.jfif" },
+      { id: "039", sciName: "Psarocolius montezuma", comName: "Oropéndola de Moctezuma", group: "Aves", danger: "Inofensiva", status: "LC", activity: "Diurna", diet: "Omnívora", rarity: "normal", img: "https://cdn.jsdelivr.net/gh/proquimicajcv-sketch/fichas-tapanti/img/ficha_039.jpg.jfif" },
+      { id: "040", sciName: "Monstera lentii", comName: "Monstera de Tapantí", group: "Plantas", danger: "Inofensiva", status: "LC", activity: "Diurna", diet: "Autótrofa", rarity: "normal", img: "https://cdn.jsdelivr.net/gh/proquimicajcv-sketch/fichas-tapanti/img/ficha_040.jpg.jfif" },
+      { id: "041", sciName: "Helicina funcki", comName: "Caracol terrestre", group: "Invertebrados", danger: "Inofensiva", status: "LC", activity: "Nocturna", diet: "Detritívora", rarity: "uncommon", img: "https://cdn.jsdelivr.net/gh/proquimicajcv-sketch/fichas-tapanti/img/ficha_041.jpg.jfif" },
+      { id: "042", sciName: "Incilius coniferus", comName: "Sapo de la hojarasca", group: "Anfibios", danger: "Inofensiva", status: "LC", activity: "Nocturna", diet: "Insectívora", rarity: "uncommon", img: "https://cdn.jsdelivr.net/gh/proquimicajcv-sketch/fichas-tapanti/img/ficha_042.jpg.jfif" },
+      { id: "043", sciName: "Lithobates warszewitschii", comName: "Rana guerrera de montaña", group: "Anfibios", danger: "Inofensiva", status: "LC", activity: "Nocturna", diet: "Insectívora", rarity: "uncommon", img: "https://cdn.jsdelivr.net/gh/proquimicajcv-sketch/fichas-tapanti/img/ficha_043.jpg.jfif" },
+      { id: "044", sciName: "Oedipina uniformis", comName: "Salamandra lombriz", group: "Anfibios", danger: "Inofensiva", status: "LC", activity: "Nocturna", diet: "Insectívora", rarity: "rare", img: "https://cdn.jsdelivr.net/gh/proquimicajcv-sketch/fichas-tapanti/img/ficha_044.jpg.jfif" },
+      { id: "045", sciName: "Isthmohyla pseudopuma", comName: "Rana de prado", group: "Anfibios", danger: "Inofensiva", status: "LC", activity: "Nocturna", diet: "Insectívora", rarity: "uncommon", img: "https://cdn.jsdelivr.net/gh/proquimicajcv-sketch/fichas-tapanti/img/ficha_045.jpg.jfif" },
+      { id: "046", sciName: "Leopardus pardalis", comName: "Manigordo / Ocelote", group: "Mamíferos", danger: "Inofensiva", status: "LC", activity: "Nocturna", diet: "Carnívora", rarity: "legendary", img: "https://cdn.jsdelivr.net/gh/proquimicajcv-sketch/fichas-tapanti/img/ficha_046.jpg.jfif" },
+      { id: "047", sciName: "Puma concolor", comName: "Puma / León de montaña", group: "Mamíferos", danger: "Inofensiva", status: "LC", activity: "Nocturna", diet: "Carnívora", rarity: "mythic", img: "https://cdn.jsdelivr.net/gh/proquimicajcv-sketch/fichas-tapanti/img/ficha_047.jpg.jfif" },
+      { id: "048", sciName: "Cuniculus paca", comName: "Tepezcuintle / Paca", group: "Mamíferos", danger: "Inofensiva", status: "LC", activity: "Nocturna", diet: "Frugívora", rarity: "uncommon", img: "https://cdn.jsdelivr.net/gh/proquimicajcv-sketch/fichas-tapanti/img/ficha_048.jpg.jfif" },
+      { id: "049", sciName: "Pecari tajacu", comName: "Saíno / Pecarí", group: "Mamíferos", danger: "Inofensiva", status: "LC", activity: "Diurna", diet: "Omnívora", rarity: "uncommon", img: "https://cdn.jsdelivr.net/gh/proquimicajcv-sketch/fichas-tapanti/img/ficha_049.jpg.jfif" },
+      { id: "050", sciName: "Potos flavus", comName: "Martica / Kinkajú", group: "Mamíferos", danger: "Inofensiva", status: "LC", activity: "Nocturna", diet: "Frugívora", rarity: "epic", img: "https://cdn.jsdelivr.net/gh/proquimicajcv-sketch/fichas-tapanti/img/ficha_050.jpg.jfif" },
+      { id: "051", sciName: "Erythrolamprus bizona", comName: "Falsa coral", group: "Reptiles", danger: "Inofensiva", status: "LC", activity: "Diurna / Crepuscular", diet: "Ofiófaga / Saurófaga", rarity: "rare", img: "https://cdn.jsdelivr.net/gh/proquimicajcv-sketch/fichas-tapanti/img/ficha_051.jpg.jfif" },
+      { id: "052", sciName: "Dendropsophus ebraccatus", comName: "Rana Reloj de Arena", group: "Anfibios", danger: "Inofensiva", status: "LC", activity: "Nocturna", diet: "Insectívora", rarity: "uncommon", img: "https://cdn.jsdelivr.net/gh/proquimicajcv-sketch/fichas-tapanti/img/ficha_052.jpg.jfif" },
+      { id: "053", sciName: "Pharomachrus mocinno", comName: "Quetzal resplandeciente", group: "Aves", danger: "Inofensiva", status: "NT", activity: "Diurna", diet: "Frugívora", rarity: "legendary", img: "https://cdn.jsdelivr.net/gh/proquimicajcv-sketch/fichas-tapanti/img/ficha_053.jpg.jfif" },
+      { id: "054", sciName: "Herpailurus yagouaroundi", comName: "Jaguarundí", group: "Mamíferos", danger: "Inofensiva", status: "NT", activity: "Diurna / Crepuscular", diet: "Carnívora", rarity: "epic", img: "https://cdn.jsdelivr.net/gh/proquimicajcv-sketch/fichas-tapanti/img/ficha_054.jpg.jfif" },
+      { id: "055", sciName: "Sobralia decora", comName: "Orquídea de altura", group: "Plantas", danger: "Inofensiva", status: "LC", activity: "Diurna", diet: "Polinización", rarity: "uncommon", img: "https://cdn.jsdelivr.net/gh/proquimicajcv-sketch/fichas-tapanti/img/ficha_055.jpg.jfif" },
+      { id: "056", sciName: "Cyathea spp.", comName: "Helecho arbóreo", group: "Plantas", danger: "Inofensiva", status: "LC", activity: "Diurna", diet: "Esporas", rarity: "uncommon", img: "https://cdn.jsdelivr.net/gh/proquimicajcv-sketch/fichas-tapanti/img/ficha_056.jpg.jfif" },
+      { id: "057", sciName: "Myadestes melanops", comName: "Jilguero de montaña", group: "Aves", danger: "Inofensiva", status: "LC", activity: "Diurna y Crepuscular", diet: "Insectívora y Frugívora", rarity: "uncommon", img: "https://cdn.jsdelivr.net/gh/proquimicajcv-sketch/fichas-tapanti/img/ficha_057.jpg.jfif" },
+      { id: "058", sciName: "Eugenes fulgens", comName: "Colibrí brillante", group: "Aves", danger: "Inofensivo", status: "LC", activity: "Diurna y Crepuscular", diet: "Nectarívora", rarity: "rare", img: "https://cdn.jsdelivr.net/gh/proquimicajcv-sketch/fichas-tapanti/img/ficha_058.jpg.jfif" },
+      { id: "059", sciName: "Heliomaster longirostris", comName: "Colibrí piquilargo", group: "Aves", danger: "Inofensiva", status: "LC", activity: "Diurna y Crepuscular", diet: "Nectarívora", rarity: "rare", img: "https://cdn.jsdelivr.net/gh/proquimicajcv-sketch/fichas-tapanti/img/ficha_059.jpg.jfif" },
+      { id: "060", sciName: "Chamaepetes unicolor", comName: "Pava negra", group: "Aves", danger: "Inofensiva", status: "NT", activity: "Diurna", diet: "Frugívora", rarity: "epic", img: "https://cdn.jsdelivr.net/gh/proquimicajcv-sketch/fichas-tapanti/img/ficha_060.jpg.jfif" },
+      { id: "061", sciName: "Cebus imitator", comName: "Mono carablanca", group: "Mamíferos", danger: "Inofensivo", status: "VU", activity: "Diurna", diet: "Omnívora", rarity: "rare", img: "https://cdn.jsdelivr.net/gh/proquimicajcv-sketch/fichas-tapanti/img/ficha_061.jpg.jfif" },
+      { id: "062", sciName: "Guzmania spp.", comName: "Bromelia gigante", group: "Plantas", danger: "Inofensiva", status: "LC", activity: "Diurna", diet: "Polinización", rarity: "uncommon", img: "https://cdn.jsdelivr.net/gh/proquimicajcv-sketch/fichas-tapanti/img/ficha_062.jpg.jfif" },
+      { id: "063", sciName: "Cerdocyon thous", comName: "Zorro cangrejero", group: "Mamíferos", danger: "Inofensiva", status: "LC", activity: "Crepuscular y nocturna", diet: "Omnívora", rarity: "uncommon", img: "https://cdn.jsdelivr.net/gh/proquimicajcv-sketch/fichas-tapanti/img/ficha_063.jpg.jfif" },
+      { id: "064", sciName: "Bothriechis nigroadspersus", comName: "Bocaracá", group: "Reptiles", danger: "Venenosa", status: "NT", activity: "Nocturna / Crepuscular", diet: "Carnívora", rarity: "epic", img: "https://cdn.jsdelivr.net/gh/proquimicajcv-sketch/fichas-tapanti/img/ficha_064.jpg.jfif" },
+      { id: "065", sciName: "Kinosternon leucostomum", comName: "Tortuga de pantano", group: "Reptiles", danger: "Inofensiva", status: "LC", activity: "Diurna y crepuscular", diet: "Omnívora", rarity: "uncommon", img: "https://cdn.jsdelivr.net/gh/proquimicajcv-sketch/fichas-tapanti/img/ficha_065.jpg.jfif" },
+      { id: "066", sciName: "Atropoides picadoi", comName: "Mano de Piedra Costarricense", group: "Reptiles", danger: "Venenosa", status: "NT", activity: "Diurna y Crepuscular", diet: "Omnívora", rarity: "epic", img: "https://cdn.jsdelivr.net/gh/proquimicajcv-sketch/fichas-tapanti/img/ficha_066.jpg.jfif" },
+      { id: "067", sciName: "Morpho peleides", comName: "Mariposa Morpho azul", group: "Insectos", danger: "Inofensiva", status: "LC", activity: "Diurna", diet: "Frugívora / Polinizadora", rarity: "uncommon", img: "https://cdn.jsdelivr.net/gh/proquimicajcv-sketch/fichas-tapanti/img/ficha_067.jpg.jfif" },
+      { id: "068", sciName: "Caligo memnon", comName: "Mariposa Ojo de búho", group: "Insectos", danger: "Inofensiva", status: "LC", activity: "Crepuscular / Nocturna", diet: "Frugívora", rarity: "uncommon", img: "https://cdn.jsdelivr.net/gh/proquimicajcv-sketch/fichas-tapanti/img/ficha_068.jpg.jfif" },
+      { id: "069", sciName: "Atta cephalotes", comName: "Hormiga arriera", group: "Insectos", danger: "Inofensiva", status: "LC", activity: "Diurna y Nocturna", diet: "Fungívora", rarity: "normal", img: "https://cdn.jsdelivr.net/gh/proquimicajcv-sketch/fichas-tapanti/img/ficha_069.jpg.jfif" },
+      { id: "070", sciName: "Ludwigia peruviana", comName: "Clavo de Laguna", group: "Plantas", danger: "Inofensiva", status: "LC", activity: "Diurna", diet: "Polinización", rarity: "normal", img: "https://cdn.jsdelivr.net/gh/proquimicajcv-sketch/fichas-tapanti/img/ficha_070.jpg.jfif" },
+      { id: "071", sciName: "Doryfera ludovicae", comName: "Colibrí Picolanza Mayor", group: "Aves", danger: "Inofensivo", status: "LC", activity: "Diurna", diet: "Polinizador", rarity: "uncommon", img: "https://cdn.jsdelivr.net/gh/proquimicajcv-sketch/fichas-tapanti/img/ficha_071.jpg.jfif" },
+      { id: "072", sciName: "Eubucco bourcierii", comName: "Torito Cabecirrojo", group: "Aves", danger: "Inofensiva", status: "LC", activity: "Diurna", diet: "Frugívora", rarity: "rare", img: "https://cdn.jsdelivr.net/gh/proquimicajcv-sketch/fichas-tapanti/img/ficha_072.jpg.jfif" },
+      { id: "073", sciName: "Selaginella kraussiana", comName: "Musgo de licopodio", group: "Plantas", danger: "Inofensiva", status: "LC", activity: "Diurna", diet: "Por esporas", rarity: "normal", img: "https://cdn.jsdelivr.net/gh/proquimicajcv-sketch/fichas-tapanti/img/ficha_073.jpg.jfif" },
+      { id: "074", sciName: "Philodendron verrucosum", comName: "Filodendro verrucoso", group: "Plantas", danger: "Inofensiva", status: "LC", activity: "Diurna", diet: "Propagación", rarity: "uncommon", img: "https://cdn.jsdelivr.net/gh/proquimicajcv-sketch/fichas-tapanti/img/ficha_074.jpg.jfif" },
+      { id: "075", sciName: "Colaspis sp.", comName: "Escarabajo de la hoja", group: "Insectos", danger: "Perjudicial", status: "LC", activity: "Diurna", diet: "Folívora", rarity: "normal", img: "https://cdn.jsdelivr.net/gh/proquimicajcv-sketch/fichas-tapanti/img/ficha_075.jpg.jfif" },
+      { id: "076", sciName: "Erateina staudingeri", comName: "Polilla geométrica de franjas", group: "Insectos", danger: "Inofensiva", status: "LC", activity: "Diurna y crepuscular", diet: "Nectarívora", rarity: "uncommon", img: "https://cdn.jsdelivr.net/gh/proquimicajcv-sketch/fichas-tapanti/img/ficha_076.jpg.jfif" },
+      { id: "077", sciName: "Pristimantis cruentus", comName: "Rana de Lluvia de Manchas Doradas", group: "Anfibios", danger: "Inofensiva", status: "LC", activity: "Nocturna y crepuscular", diet: "Insectívora", rarity: "uncommon", img: "https://cdn.jsdelivr.net/gh/proquimicajcv-sketch/fichas-tapanti/img/ficha_077.jpg.jfif" },
+      { id: "078", sciName: "Genero Commelina", comName: "Hierbas del Pollo", group: "Plantas", danger: "Inofensiva", status: "LC", activity: "Diurna", diet: "Polinización", rarity: "normal", img: "https://cdn.jsdelivr.net/gh/proquimicajcv-sketch/fichas-tapanti/img/ficha_078.jpg.jfif" },
+      { id: "079", sciName: "Lithobates taylori", comName: "Rana leopardo", group: "Anfibios", danger: "Inofensiva", status: "LC", activity: "Nocturna y crepuscular", diet: "Insectívora", rarity: "uncommon", img: "https://cdn.jsdelivr.net/gh/proquimicajcv-sketch/fichas-tapanti/img/ficha_079.jpg.jfif" },
+      { id: "080", sciName: "Heliconia tortuosa", comName: "Heliconia tortuosa", group: "Plantas", danger: "Inofensiva", status: "LC", activity: "Diurna", diet: "Ornitófila", rarity: "uncommon", img: "https://cdn.jsdelivr.net/gh/proquimicajcv-sketch/fichas-tapanti/img/ficha_080.jpg.jfif" }
+    ];
+
+    function getExpeditionBadge(count) {
+      if (count >= 80) return { level: 6, title: "Maestro Supremo de Tapantí", icon: "👑", desc: "¡Leyenda viva del bosque! Has dominado todo el conocimiento biológico de la guía." };
+      if (count >= 60) return { level: 5, title: "Centinela del Bosque Nuboso", icon: "🦊", desc: "Tus sentidos están totalmente adaptados a la neblina y los misterios de la altura." };
+      if (count >= 45) return { level: 4, title: "Rastreador de Altura", icon: "🐍", desc: "Dominas los senderos escarpados y descubres lo que otros pasan por alto." };
+      if (count >= 30) return { level: 3, title: "Guardián de Anfibios", icon: "🐸", desc: "El sonido del agua y la hojarasca húmeda ya no guardan secretos para ti." };
+      if (count >= 18) return { level: 2, title: "Naturalista en Ruta", icon: "🌿", desc: "Tus pasos dejan huella y tus ojos descubren la vida oculta del bosque." };
+      if (count >= 8) return { level: 1, title: "Observador de Sotobosque", icon: "🔎", desc: "Comienzas a descifrar los patrones y texturas de la naturaleza." };
+      if (count >= 1) return { level: 0, title: "Explorador Novato", icon: "🌱", desc: "Primeros pasos firmes en la entrada del sendero. ¡Aventúrate más adentro!" };
+      return { level: -1, title: "Sin Rango", icon: "🧭", desc: "Aún no has registrado especies. ¡Empieza tu expedición hoy!" };
+    }
+
+    function getTriviaTitle(score) {
+      if (score >= 45) return "🌟 Doctor Honoris Causa en Biodiversidad";
+      if (score >= 40) return "👑 Maestro Supremo de la Ecología";
+      if (score >= 35) return "🔬 Biólogo de Campo Avanzado";
+      if (score >= 30) return "🌿 Naturalista Experto en Bosques Nubosos";
+      if (score >= 25) return "🐍 Rastreador Científico Senior";
+      if (score >= 20) return "🐸 Guardián de la Herpetofauna";
+      if (score >= 15) return "🔎 Investigador de Sotobosque";
+      if (score >= 10) return "🌿 Explorador Comprometido";
+      if (score >= 5) return "🌱 Observador Curioso";
+      return "🌱 Aprendiz de Campo";
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      const welcomeSplash = document.getElementById("welcome-splash");
+      const btnEnterApp = document.getElementById("btn-enter-app");
+      btnEnterApp.onclick = () => {
+        welcomeSplash.classList.add("fade-out");
+        setTimeout(() => { welcomeSplash.style.display = "none"; }, 400);
+      };
+
+      const STORAGE_KEY = "tapanti_sightings_v2";
+      let sightings = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
+      let currentUser = null;
+      let currentFilter = "all";
+      let currentSearch = "";
+      let activeSpeciesForForm = null;
+
+      let lastKnownLevel = getExpeditionBadge(Object.keys(sightings).length).level;
+
+      const cardsGrid = document.getElementById("cards-grid");
+      const counterBadge = document.getElementById("counter-badge");
+      const seenRatioText = document.getElementById("seen-ratio-text");
+      const searchInput = document.getElementById("search-input");
+      const clearSearchBtn = document.getElementById("clear-search");
+      const filterPills = document.querySelectorAll(".filter-pill");
+
+      const modalRankup = document.getElementById("modal-rankup");
+      const rankupIcon = document.getElementById("rankup-icon");
+      const rankupName = document.getElementById("rankup-name");
+      const rankupMoto = document.getElementById("rankup-moto");
+      document.getElementById("btn-close-rankup").onclick = () => modalRankup.classList.add("hidden");
+
+      const modalGlossary = document.getElementById("modal-glossary");
+      const glossaryListContainer = document.getElementById("glossary-list-container");
+      document.getElementById("btn-open-glossary").onclick = () => {
+        renderGlossary();
+        modalGlossary.classList.remove("hidden");
+      };
+      document.getElementById("close-glossary-modal").onclick = () => modalGlossary.classList.add("hidden");
+
+      function renderGlossary() {
+        glossaryListContainer.innerHTML = "";
+        GLOSSARY_DATA.forEach(item => {
+          const div = document.createElement("div");
+          div.className = "glossary-item";
+          div.innerHTML = `<div class="glossary-term">${item.term}</div><div class="glossary-def">${item.def}</div>`;
+          glossaryListContainer.appendChild(div);
+        });
+      }
+
+      const modalTrivia = document.getElementById("modal-trivia");
+      const triviaBoxContainer = document.getElementById("trivia-box-container");
+      const triviaScoreText = document.getElementById("trivia-score-text");
+      const triviaRankBanner = document.getElementById("trivia-rank-banner");
+      
+      let shuffledTriviaIndices = [];
+      let currentTriviaStep = 0;
+      let triviaScore = 0;
+      let lastKnownTriviaTitle = "";
+
+      function shuffleArray(array) {
+        let arr = [...array];
+        for (let i = arr.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+        return arr;
+      }
+
+      document.getElementById("btn-open-trivia").onclick = () => {
+        shuffledTriviaIndices = shuffleArray([...Array(TRIVIA_DATA.length).keys()]);
+        currentTriviaStep = 0;
+        triviaScore = 0;
+        lastKnownTriviaTitle = getTriviaTitle(0);
+        renderTriviaQuestion();
+        modalTrivia.classList.remove("hidden");
+      };
+      document.getElementById("close-trivia-modal").onclick = () => modalTrivia.classList.add("hidden");
+
+      function renderTriviaQuestion() {
+        const currentTitle = getTriviaTitle(triviaScore);
+        
+        if (triviaScore > 0 && triviaScore % 5 === 0 && currentTitle !== lastKnownTriviaTitle) {
+          lastKnownTriviaTitle = currentTitle;
+          showToast(`🏆 ¡Nuevo Título: ${currentTitle}!`);
+        }
+
+        triviaScoreText.textContent = `Pregunta ${currentTriviaStep + 1} de 50 · Aciertos: ${triviaScore}`;
+        triviaRankBanner.textContent = `📜 Título Actual: ${currentTitle} (${triviaScore} aciertos)`;
+
+        if (currentTriviaStep >= shuffledTriviaIndices.length) {
+          triviaBoxContainer.innerHTML = `
+            <div style="text-align:center; padding:30px;">
+              <h3>🎉 ¡Reto Completado con Éxito!</h3>
+              <p style="margin: 12px 0;">Has respondido todo el banco de preguntas de la gira de campo.</p>
+              <p><strong>Aciertos totales: ${triviaScore} de 50</strong></p>
+              <p style="margin-top: 8px; color: #2b9348; font-weight: 700;">Título Final: ${currentTitle}</p>
+              <button class="btn-primary" style="margin-top: 18px;" onclick="document.getElementById('btn-open-trivia').click()">Volver a Jugar</button>
+            </div>
+          `;
+          return;
+        }
+
+        const realIndex = shuffledTriviaIndices[currentTriviaStep];
+        const qData = TRIVIA_DATA[realIndex];
+
+        let optionsList = shuffleArray([qData.correct, ...qData.others]);
+
+        triviaBoxContainer.innerHTML = `
+          <div class="trivia-question">${qData.q}</div>
+          <div class="trivia-options" id="trivia-options-group"></div>
+          <div id="trivia-feedback-box" class="trivia-feedback hidden"></div>
+          <div class="trivia-nav-row" id="trivia-nav-row">
+            ${currentTriviaStep > 0 ? '<button type="button" id="btn-trivia-prev" class="btn-secondary">← Anterior</button>' : ''}
+            <button type="button" id="btn-trivia-next" class="btn-primary" disabled>Siguiente ➔</button>
+          </div>
+        `;
+
+        const optionsGroup = document.getElementById("trivia-options-group");
+        const feedbackBox = document.getElementById("trivia-feedback-box");
+        const btnNext = document.getElementById("btn-trivia-next");
+        const btnPrev = document.getElementById("btn-trivia-prev");
+
+        optionsList.forEach((optText) => {
+          const btn = document.createElement("button");
+          btn.className = "trivia-option-btn";
+          btn.textContent = optText;
+          btn.onclick = () => {
+            const allBtns = optionsGroup.querySelectorAll("button");
+            allBtns.forEach(b => b.disabled = true);
+            
+            const isCorrect = (optText === qData.correct);
+            if (isCorrect) {
+              btn.classList.add("correct");
+              triviaScore++;
+              showToast("¡Correcto! 🎯");
+            } else {
+              btn.classList.add("incorrect");
+              allBtns.forEach(b => {
+                if (b.textContent === qData.correct) b.classList.add("correct");
+              });
+              showToast("Incorrecto. ¡Revisa la retroalimentación!");
+            }
+
+            feedbackBox.innerHTML = `<strong>💡 Retroalimentación biológica:</strong> ${qData.feedback}`;
+            feedbackBox.classList.remove("hidden");
+            btnNext.disabled = false;
+            triviaScoreText.textContent = `Pregunta ${currentTriviaStep + 1} de 50 · Aciertos: ${triviaScore}`;
+            triviaRankBanner.textContent = `📜 Título Actual: ${getTriviaTitle(triviaScore)} (${triviaScore} aciertos)`;
+          };
+          optionsGroup.appendChild(btn);
+        });
+
+        btnNext.onclick = () => {
+          currentTriviaStep++;
+          renderTriviaQuestion();
+        };
+
+        if (btnPrev) {
+          btnPrev.onclick = () => {
+            if (currentTriviaStep > 0) {
+              currentTriviaStep--;
+              renderTriviaQuestion();
+            }
+          };
+        }
+      }
+
+      const modalCardImg = document.getElementById("card-modal-img");
+      const btnZoomIn = document.getElementById("btn-zoom-in");
+      const btnZoomOut = document.getElementById("btn-zoom-out");
+      const btnZoomReset = document.getElementById("btn-zoom-reset");
+      let currentZoom = 100;
+
+      btnZoomIn.onclick = () => { 
+        currentZoom = Math.min(currentZoom + 30, 300); 
+        modalCardImg.style.width = `${currentZoom}%`; 
+      };
+      btnZoomOut.onclick = () => { 
+        currentZoom = Math.max(currentZoom - 30, 100); 
+        modalCardImg.style.width = `${currentZoom}%`; 
+      };
+      btnZoomReset.onclick = () => { 
+        currentZoom = 100; 
+        modalCardImg.style.width = `100%`; 
+      };
+
+      const sightGpsInput = document.getElementById("sight-gps");
+      
+      function autoCaptureGPS() {
+        if (!navigator.geolocation) {
+          sightGpsInput.value = "GPS no compatible";
+          return;
+        }
+        sightGpsInput.value = "Detectando ubicación exacta...";
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            const lat = position.coords.latitude.toFixed(6);
+            const lon = position.coords.longitude.toFixed(6);
+            sightGpsInput.value = `${lat}, ${lon}`;
+          },
+          (error) => {
+            sightGpsInput.value = "GPS no disponible (Ubicación manual)";
+          },
+          { timeout: 10000, enableHighAccuracy: true, maximumAge: 60000 }
+        );
+      }
+
+      const btnAuthTrigger = document.getElementById("btn-auth-trigger");
+      const authBtnLabel = document.getElementById("auth-btn-label");
+      const modalAuth = document.getElementById("modal-auth");
+      const closeAuthModal = document.getElementById("close-auth-modal");
+      const authForm = document.getElementById("auth-form");
+      const authModalTitle = document.getElementById("auth-modal-title");
+      const authPasswordGroup = document.getElementById("auth-password-group");
+      const authSubmitBtn = document.getElementById("auth-submit-btn");
+      const authForgotLink = document.getElementById("auth-forgot-link");
+      const authSwitchLink = document.getElementById("auth-switch-link");
+      const authErrorMsg = document.getElementById("auth-error-msg");
+      const authPasswordInput = document.getElementById("auth-password");
+      const btnTogglePass = document.getElementById("btn-toggle-pass");
+
+      let isRegisterMode = false;
+      let isForgotMode = false;
+
+      btnTogglePass.onclick = () => {
+        if (authPasswordInput.type === "password") {
+          authPasswordInput.type = "text";
+          btnTogglePass.textContent = "🙈";
+        } else {
+          authPasswordInput.type = "password";
+          btnTogglePass.textContent = "👁️";
+        }
+      };
+
+      auth.onAuthStateChanged(user => {
+        currentUser = user;
+        if (user) {
+          const shortName = user.email.split('@')[0];
+          authBtnLabel.textContent = shortName;
+          btnAuthTrigger.innerHTML = `<span class="user-pill-badge">👤 ${shortName}</span>`;
+        } else {
+          authBtnLabel.textContent = "Ingresar";
+          btnAuthTrigger.innerHTML = `<span>👤</span> <span>Ingresar</span>`;
+        }
+        updateStats();
+        renderCards();
+      });
+
+      function checkRankUp(newCount) {
+        const newBadge = getExpeditionBadge(newCount);
+        if (newBadge.level > lastKnownLevel) {
+          lastKnownLevel = newBadge.level;
+          rankupIcon.textContent = newBadge.icon;
+          rankupName.textContent = newBadge.title;
+          rankupMoto.textContent = `“${newBadge.desc}”`;
+          modalRankup.classList.remove("hidden");
+        }
+      }
+
+      function saveSightings() {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(sightings));
+        updateStats();
+      }
+
+      function showToast(msg) {
+        const toast = document.getElementById("toast");
+        toast.textContent = msg;
+        toast.classList.remove("hidden");
+        setTimeout(() => { toast.classList.add("hidden"); }, 2400);
+      }
+
+      function updateStats() {
+        const totalCount = SPECIES_DATA.length;
+        const seenCount = Object.keys(sightings).length;
+        counterBadge.textContent = seenCount;
+        seenRatioText.innerHTML = `<strong>${seenCount} de ${totalCount}</strong> registrados`;
+        const seenPill = document.querySelector('[data-filter="seen"]');
+        if (seenPill) seenPill.textContent = `✅ Avistados (${seenCount})`;
+      }
+
+      function renderCards() {
+        cardsGrid.innerHTML = "";
+        
+        const sortedData = [...SPECIES_DATA].sort((a, b) => parseInt(a.id) - parseInt(b.id));
+
+        const filtered = sortedData.filter(item => {
+          const matchSearch = item.sciName.toLowerCase().includes(currentSearch.toLowerCase()) ||
+                            item.comName.toLowerCase().includes(currentSearch.toLowerCase()) ||
+                            item.id.includes(currentSearch);
+          if (!matchSearch) return false;
+          if (currentFilter === "all") return true;
+          if (currentFilter === "seen") return !!sightings[item.id];
+          return item.group === currentFilter;
+        });
+
+        if (filtered.length === 0) {
+          cardsGrid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #6b7280;"><p>No se encontraron especies en esta categoría.</p></div>`;
+          return;
+        }
+
+        filtered.forEach((item) => {
+          const isSeen = !!sightings[item.id];
+          
+          let rarityClass = "";
+          if (isSeen) {
+            if (item.rarity === "normal") rarityClass = "is-normal";
+            else if (item.rarity === "uncommon") rarityClass = "is-uncommon";
+            else if (item.rarity === "rare") rarityClass = "is-rare";
+            else if (item.rarity === "epic") rarityClass = "is-epic";
+            else if (item.rarity === "legendary") rarityClass = "is-legendary";
+            else if (item.rarity === "mythic") rarityClass = "is-mythic";
+            else if (item.rarity === "divine") rarityClass = "is-divine";
+          }
+
+          const card = document.createElement("article");
+          card.className = `species-card ${isSeen ? 'is-seen' : ''} ${rarityClass}`;
+          card.innerHTML = `
+            <div class="card-img-wrapper" data-id="${item.id}">
+              <img src="${item.img}" alt="${item.sciName}" loading="lazy">
+              <span class="zoom-hint-badge">🔍 Zoom HD</span>
+            </div>
+            <div class="card-body">
+              <div class="card-meta-line">
+                <span class="species-tag">#${item.id} · ${item.group}</span>
+                <span class="status-badge ${item.status.toLowerCase()}">${item.status}</span>
+              </div>
+              <h2 class="species-sci-name">${item.sciName}</h2>
+              <p class="species-com-name">${item.comName}</p>
+              <div class="quick-traits">
+                <span class="trait-item">🌙 ${item.activity}</span>
+                <span class="trait-item">🍽️ ${item.diet}</span>
+              </div>
+              <div class="card-footer">
+                <button class="btn-card-view" data-id="${item.id}"><span>🔎</span> Ficha</button>
+                <button class="btn-card-check ${isSeen ? 'checked' : ''}" data-id="${item.id}">
+                  <span>${isSeen ? '✓' : '＋'}</span> ${isSeen ? 'Avistado' : 'Registrar'}
+                </button>
+              </div>
+            </div>
+          `;
+          cardsGrid.appendChild(card);
+        });
+
+        cardsGrid.querySelectorAll(".card-img-wrapper, .btn-card-view").forEach(el => {
+          el.addEventListener("click", () => openCardModal(el.getAttribute("data-id")));
+        });
+
+        cardsGrid.querySelectorAll(".btn-card-check").forEach(btn => {
+          btn.addEventListener("click", () => openSightingForm(btn.getAttribute("data-id")));
+        });
+      }
+
+      function openCardModal(id) {
+        const item = SPECIES_DATA.find(s => s.id === id);
+        if (!item) return;
+        activeSpeciesForForm = item;
+        currentZoom = 100;
+        modalCardImg.style.width = `100%`;
+        modalCardImg.src = item.img;
+        document.getElementById("modal-card-title").textContent = item.sciName;
+        document.getElementById("modal-card-common").textContent = `#${item.id} · ${item.comName}`;
+        document.getElementById("modal-btn-label").textContent = sightings[id] ? "Ver / Editar Registro" : "Registrar Avistamiento";
+        document.getElementById("modal-card").classList.remove("hidden");
+      }
+
+      document.getElementById("close-card-modal").onclick = () => document.getElementById("modal-card").classList.add("hidden");
+      document.getElementById("modal-action-btn").onclick = () => {
+        document.getElementById("modal-card").classList.add("hidden");
+        if (activeSpeciesForForm) openSightingForm(activeSpeciesForForm.id);
+      };
+
+      function openSightingForm(id) {
+        const item = SPECIES_DATA.find(s => s.id === id);
+        if (!item) return;
+        activeSpeciesForForm = item;
+        document.getElementById("form-species-num").textContent = `#${item.id} · ${item.group}`;
+        document.getElementById("form-species-name").textContent = item.sciName;
+        document.getElementById("form-species-common").textContent = item.comName;
+
+        const existing = sightings[id];
+        const now = new Date();
+        document.getElementById("sight-date").value = existing ? existing.date : now.toISOString().slice(0, 10);
+        document.getElementById("sight-time").value = existing ? existing.time : now.toTimeString().slice(0, 5);
+        document.getElementById("sight-trail").value = existing ? existing.trail : "Sendero La Pava";
+        
+        sightGpsInput.value = existing ? (existing.gps || "") : "";
+        if (!existing || !existing.gps) {
+          autoCaptureGPS();
+        }
+
+        document.getElementById("sight-habitat-note").value = existing ? existing.habitatNote : "";
+        document.getElementById("sight-notes").value = existing ? existing.notes : "";
+        document.getElementById("modal-sighting").classList.remove("hidden");
+      }
+
+      document.getElementById("close-sighting-modal").onclick = () => document.getElementById("modal-sighting").classList.add("hidden");
+      document.getElementById("btn-cancel-sighting").onclick = () => document.getElementById("modal-sighting").classList.add("hidden");
+
+      document.getElementById("sighting-form").addEventListener("submit", (e) => {
+        e.preventDefault();
+        if (!activeSpeciesForForm) return;
+        const id = activeSpeciesForForm.id;
+        const wasAlreadySeen = !!sightings[id];
+        const rarity = activeSpeciesForForm.rarity;
+
+        sightings[id] = {
+          id, sciName: activeSpeciesForForm.sciName, comName: activeSpeciesForForm.comName,
+          group: activeSpeciesForForm.group, date: document.getElementById("sight-date").value,
+          time: document.getElementById("sight-time").value, trail: document.getElementById("sight-trail").value,
+          gps: sightGpsInput.value.trim(),
+          habitatNote: document.getElementById("sight-habitat-note").value.trim(), notes: document.getElementById("sight-notes").value.trim()
+        };
+        saveSightings();
+        renderCards();
+        document.getElementById("modal-sighting").classList.add("hidden");
+        
+        if (!wasAlreadySeen && rarity !== "normal" && rarity !== "uncommon" && rarity !== "rare") {
+          const titles = { epic: "⚡ ¡Hallazgo Épico", legendary: "🌟 ¡Ficha Legendaria", mythic: "🔮 ¡Tesoro Mítico", divine: "👑 ¡Avistamiento Divino" };
+          showToast(`${titles[rarity]}: ${activeSpeciesForForm.comName}!`);
+        } else {
+          showToast(`✓ Registrado: ${activeSpeciesForForm.comName}`);
+        }
+
+        checkRankUp(Object.keys(sightings).length);
+      });
+
+      const modalIndex = document.getElementById("modal-index");
+      document.getElementById("btn-view-sightings").onclick = () => { renderSightingsIndex(); modalIndex.classList.remove("hidden"); };
+      document.getElementById("close-index-modal").onclick = () => modalIndex.classList.add("hidden");
+
+      function renderSightingsIndex() {
+        const list = Object.values(sightings);
+        const currentBadge = getExpeditionBadge(list.length);
+        
+        document.getElementById("sighting-summary-stats").textContent = `${list.length} de ${SPECIES_DATA.length} especies confirmadas`;
+        
+        const badgeContainer = document.getElementById("badge-container");
+        badgeContainer.innerHTML = `
+          <div class="badge-banner">
+            <div class="badge-icon">${currentBadge.icon}</div>
+            <div class="badge-info">
+              <h4>Rango Actual: ${currentBadge.title}</h4>
+              <p>${currentBadge.desc}</p>
+            </div>
+          </div>
+        `;
+
+        const sightingsList = document.getElementById("sightings-list");
+        if (list.length === 0) {
+          sightingsList.innerHTML = `<div class="empty-state" style="text-align:center; padding:30px;"><p><strong>No hay avistamientos registrados.</strong></p></div>`;
+          return;
+        }
+        list.sort((a, b) => parseInt(a.id) - parseInt(b.id));
+        sightingsList.innerHTML = "";
+        list.forEach(s => {
+          const itemCard = document.createElement("div");
+          itemCard.className = "sighting-item-card";
+          itemCard.innerHTML = `
+            <div class="sighting-item-top">
+              <div>
+                <span class="species-tag">#${s.id} · ${s.group}</span>
+                <div class="sighting-item-title">${s.sciName}</div>
+                <div class="sighting-item-com">${s.comName}</div>
+              </div>
+              <button class="btn-remove-sighting" data-id="${s.id}">&times;</button>
+            </div>
+            <div class="sighting-meta-row">
+              <span>📅 ${s.date}</span><span>⏰ ${s.time}</span><span>📍 ${s.trail}</span>
+              ${s.gps ? `<span>🌐 GPS: ${s.gps}</span>` : ''}
+              ${s.habitatNote ? `<span>🌿 ${s.habitatNote}</span>` : ''}
+            </div>
+            ${s.notes ? `<div class="sighting-note-text">“${s.notes}”</div>` : ''}
+          `;
+          itemCard.querySelector(".btn-remove-sighting").onclick = () => {
+            delete sightings[s.id];
+            saveSightings();
+            renderCards();
+            renderSightingsIndex();
+            showToast("Avistamiento removido");
+          };
+          sightingsList.appendChild(itemCard);
+        });
+      }
+
+      document.getElementById("btn-export-csv").onclick = () => {
+        const list = Object.values(sightings);
+        if (list.length === 0) { alert("No hay avistamientos."); return; }
+        list.sort((a, b) => parseInt(a.id) - parseInt(b.id));
+        const badge = getExpeditionBadge(list.length);
+        
+        let csv = `\uFEFF"RANGO DE EXPEDICIÓN:","${badge.icon} ${badge.title}"\n`;
+        csv += `"Total Especies Registradas:","${list.length}"\n\n`;
+        csv += "Ficha,Grupo,Nombre Cientifico,Nombre Comun,Fecha,Hora,Sector,Coordenadas GPS,Microhabitat,Observaciones\n";
+        list.forEach(s => {
+          csv += `"#${s.id}","${s.group}","${s.sciName}","${s.comName}","${s.date}","${s.time}","${s.trail}","${s.gps || ''}","${s.habitatNote || ''}","${s.notes || ''}"\n`;
+        });
+        const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = `Avistamientos_Tapanti.csv`;
+        link.click();
+      };
+
+      document.getElementById("btn-export-summary").onclick = () => {
+        const list = Object.values(sightings);
+        if (list.length === 0) { alert("No hay registros."); return; }
+        list.sort((a, b) => parseInt(a.id) - parseInt(b.id));
+        const badge = getExpeditionBadge(list.length);
+
+        let txt = "PARQUE NACIONAL TAPANTÍ · INFORME DE CAMPO\n";
+        txt += `🏆 Rango: ${badge.icon} ${badge.title}\n`;
+        txt += `📊 Total Registros: ${list.length}\n\n`;
+        list.forEach((s, i) => {
+          txt += `${i+1}. [Ficha #${s.id}] ${s.sciName} (${s.comName})\n   - ${s.date} ${s.time} | ${s.trail} ${s.gps ? '| GPS: ' + s.gps : ''}\n\n`;
+        });
+        navigator.clipboard.writeText(txt).then(() => showToast("✓ ¡Informe y rango copiados!"));
+      };
+
+      document.getElementById("btn-clear-all").onclick = () => {
+        if (confirm("¿Borrar todos los avistamientos?")) {
+          sightings = {};
+          lastKnownLevel = -1;
+          saveSightings();
+          renderCards();
+          renderSightingsIndex();
+          showToast("Reiniciado.");
+        }
+      };
+
+      btnAuthTrigger.onclick = () => {
+        if (currentUser) {
+          if (confirm(`¿Deseas cerrar sesión (${currentUser.email})?`)) {
+            auth.signOut().then(() => showToast("Sesión cerrada"));
+          }
+        } else {
+          modalAuth.classList.remove("hidden");
+        }
+      };
+
+      closeAuthModal.onclick = () => modalAuth.classList.add("hidden");
+
+      authSwitchLink.onclick = () => {
+        isRegisterMode = !isRegisterMode;
+        isForgotMode = false;
+        authModalTitle.textContent = isRegisterMode ? "Crear Cuenta Nueva" : "Iniciar Sesión";
+        authSubmitBtn.textContent = isRegisterMode ? "Registrarse" : "Iniciar Sesión";
+        authSwitchLink.textContent = isRegisterMode ? "¿Ya tienes cuenta? Iniciar Sesión" : "Crear cuenta nueva";
+        authForgotLink.style.display = isRegisterMode ? "none" : "block";
+        authPasswordGroup.style.display = "block";
+        authErrorMsg.style.display = "none";
+      };
+
+      authForgotLink.onclick = () => {
+        isForgotMode = true;
+        authModalTitle.textContent = "Recuperar Contraseña";
+        authSubmitBtn.textContent = "Enviar Correo de Recuperación";
+        authPasswordGroup.style.display = "none";
+        authForgotLink.style.display = "none";
+        authSwitchLink.textContent = "← Volver a Iniciar Sesión";
+        authErrorMsg.style.display = "none";
+      };
+
+      authForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const email = document.getElementById("auth-email").value.trim();
+        const password = document.getElementById("auth-password").value;
+        authErrorMsg.style.display = "none";
+
+        if (isForgotMode) {
+          auth.sendPasswordResetEmail(email).then(() => {
+            showToast("✓ Correo de recuperación enviado");
+            modalAuth.classList.add("hidden");
+            isForgotMode = false;
+          }).catch(err => {
+            authErrorMsg.textContent = err.message;
+            authErrorMsg.style.display = "block";
+          });
+          return;
+        }
+
+        if (isRegisterMode) {
+          auth.createUserWithEmailAndPassword(email, password).then(() => {
+            showToast("✓ Cuenta creada con éxito");
+            modalAuth.classList.add("hidden");
+          }).catch(err => {
+            authErrorMsg.textContent = err.message;
+            authErrorMsg.style.display = "block";
+          });
+        } else {
+          auth.signInWithEmailAndPassword(email, password).then(() => {
+            showToast("✓ Sesión iniciada");
+            modalAuth.classList.add("hidden");
+          }).catch(err => {
+            authErrorMsg.textContent = err.message;
+            authErrorMsg.style.display = "block";
+          });
+        }
+      });
+
+      filterPills.forEach(pill => {
+        pill.onclick = () => {
+          filterPills.forEach(p => p.classList.remove("active"));
+          pill.classList.add("active");
+          currentFilter = pill.getAttribute("data-filter");
+          renderCards();
+        };
+      });
+
+      searchInput.oninput = (e) => {
+        currentSearch = e.target.value.trim();
+        clearSearchBtn.classList.toggle("hidden", currentSearch === "");
+        renderCards();
+      };
+
+      clearSearchBtn.onclick = () => {
+        searchInput.value = "";
+        currentSearch = "";
+        clearSearchBtn.classList.add("hidden");
+        renderCards();
+      };
+
+      updateStats();
+      renderCards();
+    });
+  </script>
+</body>
+</html>
